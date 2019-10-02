@@ -34,6 +34,23 @@ var quizStorage = multer.diskStorage({
 
 var uploadQuizzes = multer({ storage: quizStorage }).array("file");
 
+app.delete("/content/quizzes*", function(req, res) {
+  console.log("inside delete", req.url);
+
+  var resultHandler = function(err) {
+    if (err) {
+      console.log("unlink failed", err);
+    } else {
+      console.log("file deleted");
+    }
+  };
+
+  //currently working on this, need to change './c' to use 'path' from unix?
+  console.log("about to call unlink");
+  fs.unlink("./c.png", resultHandler);
+  console.log("called unlink");
+});
+
 app.post("/content/quizzes", function(req, res) {
   uploadQuizzes(req, res, function(err) {
     if (err instanceof multer.MulterError) {
