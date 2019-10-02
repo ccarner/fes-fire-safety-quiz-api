@@ -1,26 +1,25 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { ToastContainer, toast } from "react-toastify";
+import { Progress } from "reactstrap";
+import "./App.css";
+import axios from "axios";
+import UploadFileComponent from "./UploadFileComponent.js";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+  render() {
+    return (
+      <React.Fragment>
+        <h1> upload quizzes here</h1>
+        <UploadFileComponent uploadURL="http://localhost:8000/content/quizzes"></UploadFileComponent>
+
+        <h1> upload modules here</h1>
+        <UploadFileComponent uploadURL="http://localhost:8000/content/modules"></UploadFileComponent>
+
+        <h1> upload checklists here</h1>
+        <UploadFileComponent uploadURL="http://localhost:8000/content/checklists"></UploadFileComponent>
+      </React.Fragment>
+    );
+  }
 }
 
 export default App;
