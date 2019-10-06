@@ -1,23 +1,32 @@
 import React from "react";
-import { ToastContainer, toast } from "react-toastify";
-import { Progress } from "reactstrap";
+import { BrowserRouter, Switch, Route } from "react-router-dom";
 import "./App.css";
-import axios from "axios";
-import UploadFileComponent from "./UploadFileComponent.js";
+import Home from "./home.jsx";
+import NavBar from "./navbar";
+import Quizzes from "./quizzes";
+import Checklists from "./checklists";
+import Modules from "./modules";
 
 class App extends React.Component {
   render() {
     return (
-      <React.Fragment>
-        <h1> upload quizzes here</h1>
-        <UploadFileComponent uploadURL="http://localhost:8000/content/quizzes"></UploadFileComponent>
+      <BrowserRouter>
+        <div className="App">
+          <NavBar />
+          <Switch>
+            {/* use a switch so we only render max of ONE of these pages */}
+            <Route path="/" exact component={Home} />
+            <Route path="/quizzes" exact component={Quizzes} />
+            <Route path="/modules" exact component={Modules} />
+            <Route path="/checklists" exact component={Checklists} />
 
-        <h1> upload modules here</h1>
-        <UploadFileComponent uploadURL="http://localhost:8000/content/modules"></UploadFileComponent>
-
-        <h1> upload checklists here</h1>
-        <UploadFileComponent uploadURL="http://localhost:8000/content/checklists"></UploadFileComponent>
-      </React.Fragment>
+            {/* <Route
+            path="/api/quizzes"
+            component={() => (window.location = "localhost:5000/api/quizzes")}
+          /> */}
+          </Switch>
+        </div>
+      </BrowserRouter>
     );
   }
 }
