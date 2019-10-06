@@ -13,8 +13,21 @@ const url = require("url");
 // prop with the original JSON of index of the files
 
 class FileViewer extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleView = this.handleView.bind(this)
+
+}
+
   handleDelete(fileName) {
     // delete logic here
+  }
+
+  handleView(filename){
+    // note had to bind THIS in the constructor!
+    console.log("this.props",this.props);
+    const url = new URL(filename, this.props.url);
+    window.open(url);
   }
 
   render() {

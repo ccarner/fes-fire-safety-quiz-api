@@ -58,7 +58,9 @@ app.delete("/content/quizzes*", function(req, res) {
   console.log("about to call unlink", asset);
   fs.unlink(path.format(asset), resultHandler);
   console.log("called unlink");
+
 });
+
 
 app.post("/content/quizzes", function(req, res) {
   uploadQuizzes(req, res, function(err) {
@@ -67,8 +69,11 @@ app.post("/content/quizzes", function(req, res) {
     } else if (err) {
       return res.status(500).json(err);
     }
+    //keep index json updated
+    updateIndex("/content/quizzes");
     return res.status(200).send(req.file);
-  });
+  })
+   
 });
 
 app.use(
@@ -76,6 +81,44 @@ app.use(
   express.static("content"),
   serveIndex("content", { icons: true })
 );
+
+function updateIndex(directory){
+  var indexArray = []
+  const folder = path.parse("." + directory);
+  // Loop through all the files in the temp directory
+  fs.readdir(path.format(folder), function (err, files) {
+  
+    if (err) {
+      console.error("Could not list the directory.", err);
+      process.exit(1);
+    }
+
+    files.forEach(function (file, index) {
+      console.log("inside of updateIndex",file);
+      // change so that for JSONs, eg quizzes, it will get extra info like content name + information for the quiz page
+      // var file = JSON.parse(file);
+      indexArray.push({"filename":file})
+    });
+
+    console.log("before stringofy", indexArray);
+  json = JSON.stringify(indexArray);
+  console.log("post stringofy", json);
+
+  // add proper callback here
+  const indexPath = path.join(path.format(folder), "index.json");
+  fs.writeFile(indexPath, json, function(err) {
+
+    if(err) {
+        return console.log(err);
+    }
+
+    console.log("The file was saved!");
+}); 
+  
+  });
+  
+
+}
 
 // Create a multer instance and set the destination folder.
 // The code below uses /public folder. You can also assign a new file name upon upload.
