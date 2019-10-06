@@ -39,15 +39,24 @@ app.delete("/content/quizzes*", function(req, res) {
 
   var resultHandler = function(err) {
     if (err) {
+      if (err.message.includes("ENOENT")) {
+        console.log("unlink failed", err);
+        // assume failure is due to resource not found?
+        return res.status(404).send(req.file);
+      }
       console.log("unlink failed", err);
+      // assume failure is due to resource not found?
+      return res.status(400).send(req.file);
     } else {
       console.log("file deleted");
+      return res.status(200).send(req.file);
     }
   };
 
   //currently working on this, need to change './c' to use 'path' from unix?
-  console.log("about to call unlink");
-  fs.unlink("./c.png", resultHandler);
+  const asset = path.parse("." + req.url);
+  console.log("about to call unlink", asset);
+  fs.unlink(path.format(asset), resultHandler);
   console.log("called unlink");
 });
 

@@ -22,7 +22,6 @@ class Quizzes extends React.Component {
         this.setState({
           filesOnServer: data
         });
-        console.log(data);
       });
   }
 
@@ -32,9 +31,11 @@ class Quizzes extends React.Component {
         <h1> upload quizzes here</h1>
         <UploadFileComponent uploadURL="http://localhost:8000/content/quizzes"></UploadFileComponent>
         {/* only render AFTER promise resolved */}
-        {console.log("rendering new fileviewer")}
         {this.state.filesOnServer && (
-          <FileViewer index={this.state.filesOnServer}></FileViewer>
+          <FileViewer
+            index={this.state.filesOnServer}
+            url="http://localhost:8000/content/quizzes/"
+          ></FileViewer>
         )}
       </React.Fragment>
     );
