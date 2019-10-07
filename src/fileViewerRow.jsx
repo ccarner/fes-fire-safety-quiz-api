@@ -13,7 +13,7 @@ class FileViewerRow extends React.Component {
     
     return (
       <React.Fragment>
-        <h3> {this.props.filename} </h3>
+        <div> {this.props.filename}
 
         <Button
           onClick={() => this.props.handleView(this.props.filename)}
@@ -29,7 +29,7 @@ class FileViewerRow extends React.Component {
           color="default"
         >
           Delete
-        </Button>
+        </Button></div>
       </React.Fragment>
     );
   }

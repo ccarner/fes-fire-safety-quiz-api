@@ -28,8 +28,7 @@ class Quizzes extends React.Component {
   render() {
     return (
       <React.Fragment>
-        <h1> upload quizzes here</h1>
-        <UploadFileComponent uploadURL="http://localhost:8000/content/quizzes"></UploadFileComponent>
+        
         {/* only render AFTER promise resolved */}
         {this.state.filesOnServer && (
           <FileViewer
@@ -37,6 +36,9 @@ class Quizzes extends React.Component {
             url="http://localhost:8000/content/quizzes/"
           ></FileViewer>
         )}
+
+        <h1> upload quizzes here</h1>
+        <UploadFileComponent uploadURL="http://localhost:8000/content/quizzes"></UploadFileComponent>
       </React.Fragment>
     );
   }

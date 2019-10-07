@@ -58,6 +58,7 @@ app.delete("/content/quizzes*", function(req, res) {
   console.log("about to call unlink", asset);
   fs.unlink(path.format(asset), resultHandler);
   console.log("called unlink");
+  updateIndex("/content/quizzes");
 
 });
 

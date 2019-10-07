@@ -16,11 +16,34 @@ class FileViewer extends React.Component {
   constructor(props) {
     super(props);
     this.handleView = this.handleView.bind(this)
+    this.handleDelete = this.handleDelete.bind(this)
 
 }
 
-  handleDelete(fileName) {
-    // delete logic here
+  handleDelete(filename) {
+    console.log(" props url is:", this.props.url);
+    const url = new URL(filename, this.props.url);
+    console.log("url is:", url);
+    axios
+      .delete(url)
+      .then(res => {
+        toast.success("delete success");
+        console.log(res.statusText);
+      })
+      .catch(err => {
+        console.log(
+          "error response is",
+          err.response,
+          err.response.status
+        );
+        if (err.response.status === 404) {
+          toast.error(
+            "Delete failed: asset does not exist. Please refresh the page"
+          );
+        } else {
+          toast.error("Delete failed, unknown error");
+        }
+      });
   }
 
   handleView(filename){
@@ -36,7 +59,7 @@ class FileViewer extends React.Component {
         <h1> Files on Server:</h1>
 
         {this.props.index.map(file => (
-          <li>
+          <li style={{listStyleType:"none"}}>
             {" "}
             <FileViewerRow
               filename={file.filename}
@@ -45,39 +68,8 @@ class FileViewer extends React.Component {
             ></FileViewerRow>
           </li>
         ))}
-
-        <Button
-          onClick={() => {
-            console.log(" props url is:", this.props.url);
-            const url = new URL("1570068051618-leancoffee.png", this.props.url);
-            console.log("url is:", url);
-            axios
-              .delete(url)
-              .then(res => {
-                toast.success("delete success");
-                console.log(res.statusText);
-              })
-              .catch(err => {
-                console.log(
-                  "error response is",
-                  err.response,
-                  err.response.status
-                );
-                if (err.response.status === 404) {
-                  toast.error(
-                    "Delete failed: asset does not exist. Please refresh the page"
-                  );
-                } else {
-                  toast.error("Delete failed, unknown error");
-                }
-              });
-          }}
-          variant="contained"
-          color="default"
-        >
-          delete something
-        </Button>
-
+        
+        
         {/* {JSON.parse(this.props.index).map(file => (
           <h1> a file </h1>
         ))} */}
