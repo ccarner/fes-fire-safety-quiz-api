@@ -3,12 +3,20 @@ import { BrowserRouter, Switch, Route } from "react-router-dom";
 import "./App.css";
 import Home from "./home.jsx";
 import NavBar from "./navbar";
-import Quizzes from "./quizzes";
+import ContentPage from "./contentPage";
 import Checklists from "./checklists";
 import Modules from "./modules";
 
 class App extends React.Component {
   render() {
+    // {
+    //   let props = {
+    //     contentTypeQuiz: "quiz",
+    //     contentTypeMedia: "media",
+    //     contentTypeChecklist: "checklist",
+    //     contentTypeModule: "module"
+    //   };
+    // }
     return (
       <BrowserRouter>
         <div className="App">
@@ -16,10 +24,31 @@ class App extends React.Component {
           <Switch>
             {/* use a switch so we only render max of ONE of these pages */}
             <Route path="/" exact component={Home} />
-            <Route path="/quizzes" exact component={Quizzes} />
-            <Route path="/modules" exact component={Modules} />
-            <Route path="/checklists" exact component={Checklists} />
-
+            {/* including props inside of route,  can get props this way... */}
+            <Route
+              path="/quizzes"
+              render={props => (
+                <ContentPage contentType="quiz" heading="Quizzes" />
+              )}
+            />
+            <Route
+              path="/modules"
+              render={props => (
+                <ContentPage contentType="module" heading="Modules" />
+              )}
+            />
+            <Route
+              path="/checklists"
+              render={props => (
+                <ContentPage contentType="checklist" heading="Checklists" />
+              )}
+            />
+            <Route
+              path="/media"
+              render={props => (
+                <ContentPage contentType="media" heading="Media" />
+              )}
+            />
             {/* <Route
             path="/api/quizzes"
             component={() => (window.location = "localhost:5000/api/quizzes")}

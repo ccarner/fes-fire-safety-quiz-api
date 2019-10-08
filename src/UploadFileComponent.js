@@ -1,7 +1,6 @@
 import React from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Progress } from "reactstrap";
 import axios from "axios";
 
 class UploadFileComponent extends React.Component {
@@ -32,26 +31,32 @@ class UploadFileComponent extends React.Component {
 
   // for uploading file
   onClickHandler = () => {
-    const data = new FormData();
-    for (var x = 0; x < this.state.selectedFile.length; x++) {
-      data.append("file", this.state.selectedFile[x]);
+    if (this.state.selectedFile) {
+      const data = new FormData();
+      for (var x = 0; x < this.state.selectedFile.length; x++) {
+        data.append("file", this.state.selectedFile[x]);
+      }
+      axios
+        .post(this.props.uploadURL, data, {
+          // receive two parameter endpoint url ,form data
+          onUploadProgress: ProgressEvent => {
+            this.setState({
+              loaded: (ProgressEvent.loaded / ProgressEvent.total) * 100
+            });
+          }
+        })
+        .then(res => {
+          toast.success("upload success");
+          console.log(res.statusText);
+          this.props.handleUpdate();
+        })
+        .catch(err => {
+          console.log(err);
+          toast.error("upload fail");
+        });
+    } else {
+      toast.error("No files selected for upload");
     }
-    axios
-      .post(this.props.uploadURL, data, {
-        // receive two parameter endpoint url ,form data
-        onUploadProgress: ProgressEvent => {
-          this.setState({
-            loaded: (ProgressEvent.loaded / ProgressEvent.total) * 100
-          });
-        }
-      })
-      .then(res => {
-        toast.success("upload success");
-        console.log(res.statusText);
-      })
-      .catch(err => {
-        toast.error("upload fail");
-      });
   };
 
   maxSelectFile = event => {
@@ -68,34 +73,35 @@ class UploadFileComponent extends React.Component {
 
   render() {
     return (
-      <div class="container">
-        <div class="row">
-          <div class="offset-md-3 col-md-6">
-            <div class="form-group files">
-              <label>Upload Your File </label>
-              <input
-                type="file"
-                class="form-control"
-                multiple
-                onChange={this.onChangeHandler}
-              />
-            </div>
-            <div class="form-group">
-              <ToastContainer />
-              <Progress max="100" color="success" value={this.state.loaded}>
-                {Math.round(this.state.loaded, 2)}%
-              </Progress>
-            </div>
-            <button
-              type="button"
-              class="btn btn-success btn-block"
-              onClick={this.onClickHandler}
+      <React.Fragment>
+        <div class="form-group files">
+          <input
+            type="file"
+            class="form-control"
+            multiple
+            onChange={this.onChangeHandler}
+          />
+        </div>
+        <div class="form-group">
+          <ToastContainer />
+          <div class="progress">
+            <div
+              class="progress-bar"
+              style={{ width: this.state.loaded + "%" }}
             >
-              Upload
-            </button>
+              {this.state.loaded} %
+            </div>
           </div>
         </div>
-      </div>
+        <button
+          type="button"
+          class="btn btn-success btn-block this.state.selectedFile"
+          onClick={this.onClickHandler}
+          disabled={!this.state.selectedFile}
+        >
+          Upload
+        </button>
+      </React.Fragment>
     );
   }
 }

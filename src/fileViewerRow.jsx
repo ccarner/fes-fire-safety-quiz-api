@@ -10,26 +10,27 @@ import axios from "axios";
 
 class FileViewerRow extends React.Component {
   render() {
-    
     return (
       <React.Fragment>
-        <div> {this.props.filename}
-
-        <Button
-          onClick={() => this.props.handleView(this.props.filename)}
-          variant="contained"
-          color="default"
-        >
-          View
-        </Button>
-
-        <Button
-          onClick={() => this.props.handleDelete(this.props.filename)}
-          variant="contained"
-          color="default"
-        >
-          Delete
-        </Button></div>
+        <div class="col-sm-7 col-xs-4 my-auto">{this.props.filename}</div>
+        <div class="col-sm-5 col-xs-8 my-auto">
+          <Button
+            onClick={() => this.props.handleView(this.props.filename)}
+            variant="contained"
+            color="default"
+          >
+            View
+          </Button>
+          {this.props.filename !== "index.json" && (
+            <Button
+              onClick={() => this.props.handleDelete(this.props.filename)}
+              variant="contained"
+              color="default"
+            >
+              Delete
+            </Button>
+          )}
+        </div>
       </React.Fragment>
     );
   }

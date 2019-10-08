@@ -15,61 +15,38 @@ const url = require("url");
 class FileViewer extends React.Component {
   constructor(props) {
     super(props);
-    this.handleView = this.handleView.bind(this)
-    this.handleDelete = this.handleDelete.bind(this)
-
-}
-
-  handleDelete(filename) {
-    console.log(" props url is:", this.props.url);
-    const url = new URL(filename, this.props.url);
-    console.log("url is:", url);
-    axios
-      .delete(url)
-      .then(res => {
-        toast.success("delete success");
-        console.log(res.statusText);
-      })
-      .catch(err => {
-        console.log(
-          "error response is",
-          err.response,
-          err.response.status
-        );
-        if (err.response.status === 404) {
-          toast.error(
-            "Delete failed: asset does not exist. Please refresh the page"
-          );
-        } else {
-          toast.error("Delete failed, unknown error");
-        }
-      });
+    // this.updateIndex = this.updateIndex.bind(this);
+    this.state = {
+      index: props.index,
+      updated: 1
+    };
   }
 
-  handleView(filename){
-    // note had to bind THIS in the constructor!
-    console.log("this.props",this.props);
-    const url = new URL(filename, this.props.url);
-    window.open(url);
+  updateIndex(newIndex) {
+    console.log("here inside of fileViewer udpateIndex");
+    this.setState({ index: newIndex, updated: this.state.updated + 1 });
   }
 
   render() {
     return (
       <React.Fragment>
-        <h1> Files on Server:</h1>
+        <div id="fileViewer" class="container-fluid">
+          {this.props.index.map(file => (
+            //h-100 makes it full height
+            <div
+              class="row h-100"
+              style={{ border: "1px solid #cecece", height: "100%" }}
+            >
+              {" "}
+              <FileViewerRow
+                filename={file.filename}
+                handleView={this.props.handleView}
+                handleDelete={this.props.handleDelete}
+              ></FileViewerRow>
+            </div>
+          ))}
+        </div>
 
-        {this.props.index.map(file => (
-          <li style={{listStyleType:"none"}}>
-            {" "}
-            <FileViewerRow
-              filename={file.filename}
-              handleView={this.handleView}
-              handleDelete={this.handleDelete}
-            ></FileViewerRow>
-          </li>
-        ))}
-        
-        
         {/* {JSON.parse(this.props.index).map(file => (
           <h1> a file </h1>
         ))} */}

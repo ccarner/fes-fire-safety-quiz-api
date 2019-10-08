@@ -16,10 +16,10 @@
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.1.2",
     "react-toastify": "^5.4.0",
-    "reactstrap": "^8.0.1",
     "serve-index": "^1.9.1"
   },
   "scripts": {
+    "build-deploy": "npm run build && node index.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -39,5 +39,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "css-loader": "^3.2.0",
+    "style-loader": "^1.0.0"
   }
 }
