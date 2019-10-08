@@ -29,8 +29,9 @@ class Config {
     return this.IndexFileName;
   }
 }
+
 //static properties
-Config.serverUrl = "http://localhost:8000";
+Config.serverUrl = process.env.PRODUCTION_URL || "http://localhost:8000";
 Config.urls = {
   quiz: "/content/quizzes",
   media: "/content/media",
