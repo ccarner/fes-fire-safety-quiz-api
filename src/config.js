@@ -14,6 +14,12 @@ class Config {
     }
   }
   static getQuizUrl() {
+    console.log(
+      "PRODUCTIONURL:",
+      process.env.PRODUCTION_URL,
+      " serverURL",
+      this.serverUrl
+    );
     return this.serverUrl + this.urls.quiz;
   }
   static getMediaUrl() {
