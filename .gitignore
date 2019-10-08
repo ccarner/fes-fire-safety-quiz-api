@@ -12,6 +12,12 @@
 /build
 .elasticbeanstalk/
 
+# content
+/content/quizzes
+/content/checklists
+/content/media
+/content/modules
+
 # misc
 .DS_Store
 .env.local
