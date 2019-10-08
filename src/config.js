@@ -37,7 +37,8 @@ class Config {
 }
 
 //static properties
-Config.serverUrl = process.env.PRODUCTION_URL || "http://localhost:8000";
+Config.serverUrl =
+  process.env.REACT_APP_PRODUCTION_URL || "http://localhost:8000";
 Config.urls = {
   quiz: "/content/quizzes",
   media: "/content/media",
