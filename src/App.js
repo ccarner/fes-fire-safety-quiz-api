@@ -4,8 +4,6 @@ import "./App.css";
 import Home from "./home.jsx";
 import NavBar from "./navbar";
 import ContentPage from "./contentPage";
-import Checklists from "./checklists";
-import Modules from "./modules";
 
 class App extends React.Component {
   render() {

@@ -13,10 +13,16 @@
 .elasticbeanstalk/
 
 # content
-/content/quizzes
-/content/checklists
-/content/media
-/content/modules
+content/quizzes/*
+content/checklists/*
+content/media/*
+content/modules/*
+
+#exceptions to content rules (can't commit empty folders to git)
+!content/quizzes/index.json
+!content/checklists/index.json
+!content/media/index.json
+!content/modules/index.json
 
 # misc
 .DS_Store
