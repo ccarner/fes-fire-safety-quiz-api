@@ -1,6 +1,6 @@
 {
-  "quizname": "quiz 2",
-  "quizdescription": "also generic test quiz",
+  "title": "quiz 2",
+  "description": "also generic test quiz",
   "quizfile": [
     {
       "question": "asdfjkl;asdf?",

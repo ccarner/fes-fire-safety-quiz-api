@@ -180,29 +180,37 @@ function updateIndex(directory) {
         console.error("Could not list the directory.", err);
         reject(Error("error in fs.readdir"));
       }
-
       files.forEach(function(file, index) {
-        console.log("inside of updateIndex", file);
-        // change so that for JSONs, eg quizzes, it will get extra info like content name + information for the quiz page
-        // var file = JSON.parse(file);
-        indexArray.push({ filename: file });
-      });
-
-      var json = JSON.stringify(indexArray);
-
-      // add proper callback here
-      const indexPath = path.join(path.format(folder), "index.json");
-      fs.writeFile(indexPath, json, function(err) {
-        if (err) {
-          console.log(err);
-          reject(Error("error in fs.writefile"));
+        var ext = path.extname(file);
+        if (ext === ".json") {
+          // synchronised access since would need to wait for x numebr of async
+          // operations to complete before continuing (each file has its own read)
+          try {
+            const fileContents = fs.readFileSync(
+              path.normalize(__dirname + "/" + directory + "/" + file)
+            );
+            const data = JSON.parse(fileContents);
+            var newObj = {};
+            if (data.description !== undefined) {
+              newObj.description = data.description;
+            }
+            if (data.title !== undefined) {
+              newObj.title = data.title;
+            }
+            newObj.filename = file;
+            indexArray.push(newObj);
+          } catch (err) {
+            console.error(err);
+          }
+        } else {
+          // not a json, so don't try adding metadata
+          indexArray.push({ filename: file });
         }
-        console.log("The index was updated!");
-        resolve("index was updated successfully");
       });
     });
   });
 }
+
 //BELOW IS 1st ASYNC ATTEMPT for 2x functions
 
 // //intercept requests for the index, and refresh it first.
