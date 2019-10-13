@@ -152,6 +152,7 @@ app.get("*index.json", function(req, res) {
     }
   });
   //removed this for now to debug
+
   // updateIndex(newUrl).then(function(result) {
 
   // });
@@ -164,8 +165,9 @@ app.use(
   serveIndex("content", { icons: true })
 );
 
+// for the create-react-app
 app.use("/", express.static(clientBuildFolder));
-
+// for the create-react-app
 app.get("*", (req, res) => {
   console.log("inside catchall " + req.url);
   res.sendFile(path.join(clientBuildFolder, "/index.html"));
