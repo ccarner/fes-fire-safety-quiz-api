@@ -143,20 +143,21 @@ app.get("*index.json", function(req, res) {
   //remove the index.json at the end!
   console.log("url is", req.url);
   var newUrl = path.dirname(req.url);
-
-  updateIndex(newUrl).then(function(result) {
-    res.sendFile(path.normalize(__dirname + req.url), function(err) {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("Sent index:", path.normalize(__dirname + req.url));
-      }
-    });
+  console.log("url + dirname = ", req.url, path.dirname(req.url));
+  res.sendFile(path.normalize(__dirname + req.url), function(err) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log("Sent index:", path.normalize(__dirname + req.url));
+    }
   });
+  //removed this for now to debug
+  // updateIndex(newUrl).then(function(result) {
+
+  // });
 });
 
 // static content checked for last!
-
 app.use(
   "/content",
   express.static("content"),
@@ -206,6 +207,18 @@ function updateIndex(directory) {
           // not a json, so don't try adding metadata
           indexArray.push({ filename: file });
         }
+      });
+      var json = JSON.stringify(indexArray);
+
+      // add proper callback here
+      const indexPath = path.join(path.format(folder), "index.json");
+      fs.writeFile(indexPath, json, function(err) {
+        if (err) {
+          console.log(err);
+          reject(Error("error in fs.writefile"));
+        }
+        console.log("The index was updated!");
+        resolve("index was updated successfully");
       });
     });
   });
