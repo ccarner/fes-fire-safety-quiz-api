@@ -2,8 +2,9 @@ import React from "react";
 import QuizQuestionEditor from "./quizQuestionEditor.jsx";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import axios from "axios";
 import Config from "./config.js";
+import { uploadFiles } from "./Utilities";
+import { withRouter } from "react-router";
 
 class QuizEditor extends React.Component {
   constructor(props) {
@@ -11,14 +12,28 @@ class QuizEditor extends React.Component {
     this.handleQuestionUpdate = this.handleQuestionUpdate.bind(this);
     this.addNewQuestion = this.addNewQuestion.bind(this);
     this.saveQuiz = this.saveQuiz.bind(this);
-
-    this.state = {
-      quizObject: {
-        quiz_questions: [],
-        title: "New Quiz",
-        description: "New quiz Description"
-      }
+    this.handleQuestionDelete = this.handleQuestionDelete.bind(this);
+    this.handleQuestionMove = this.handleQuestionMove.bind(this);
+    this.handleQuizUpdate = this.handleQuizUpdate.bind(this);
+    this.emptyQuestion = {
+      question: "Type Question Here",
+      answer_index: [1, 2, 3, 4],
+      media: "text",
+      media_src: "",
+      answers: ["Option 1", "Option 2", "Option 3", "Option 4"],
+      max_choices: 4
     };
+    try {
+      this.state = { quizObject: this.props.location.state.quizEditing };
+    } catch (err) {
+      this.state = {
+        quizObject: {
+          quiz_questions: [],
+          title: "New Quiz",
+          description: "New quiz Description"
+        }
+      };
+    }
   }
 
   handleQuestionUpdate(questionNumber, newQuestion) {
@@ -29,34 +44,68 @@ class QuizEditor extends React.Component {
     });
   }
 
-  addNewQuestion() {
+  handleQuestionDelete(event) {
+    let questionNumber = event.target.getAttribute("question");
     this.setState(prevState => {
-      let quizObject = { ...prevState.quizObject }; // creating copy of state variable
-      quizObject.quiz_questions.push({});
+      let quizObject = { ...prevState.quizObject };
+
+      //remove question from the array
+      quizObject["quiz_questions"].splice(questionNumber, 1);
+
       return { quizObject }; // return new object
     });
   }
 
-  saveQuiz() {
-    console.log("the file is:", JSON.stringify(this.state.quizObject));
-    var f = new File([JSON.stringify(this.state.quizObject)], "test.json", {
-      type: "application/json"
-    });
-    console.log(f);
-    var contentUrl = Config.getUrl("quiz");
-    const data = new FormData();
-    for (var x = 0; x < f.length; x++) {
-      data.append("file", f[x]);
+  handleQuestionMove(event) {
+    let questionNumber = parseInt(event.target.getAttribute("question"));
+    var swapQuestionNumber;
+    if (event.target.getAttribute("move") === "down") {
+      swapQuestionNumber = questionNumber + 1;
+    } else {
+      swapQuestionNumber = questionNumber - 1;
     }
-    axios
-      .post(contentUrl, data, {
-        // receive two parameter endpoint url ,form data
-        onUploadProgress: ProgressEvent => {
-          this.setState({
-            loaded: (ProgressEvent.loaded / ProgressEvent.total) * 100
-          });
-        }
-      })
+    console.log("before", this.state.quizObject);
+    this.setState(prevState => {
+      let quizObject = { ...prevState.quizObject };
+      var temp = quizObject.quiz_questions[questionNumber];
+      quizObject.quiz_questions[questionNumber] =
+        quizObject.quiz_questions[swapQuestionNumber];
+      quizObject.quiz_questions[swapQuestionNumber] = temp;
+      console.log("after", quizObject);
+      return { quizObject }; // return new object
+    });
+  }
+
+  addNewQuestion() {
+    this.setState(prevState => {
+      let quizObject = { ...prevState.quizObject }; // creating copy of state variable
+      // need to create a new quiz object which is a DEEP COPY of the empty question template...
+      var newQuestion = { ...this.emptyQuestion };
+      newQuestion.answer_index = [...this.emptyQuestion.answer_index];
+      newQuestion.answers = [...this.emptyQuestion.answers];
+
+      quizObject.quiz_questions.push(newQuestion);
+      return { quizObject }; // return new object
+    });
+  }
+
+  uploadProgressCallback(ProgressEvent) {
+    this.setState({
+      loaded: (ProgressEvent.loaded / ProgressEvent.total) * 100
+    });
+  }
+
+  saveQuiz() {
+    var f = new File(
+      [JSON.stringify(this.state.quizObject)],
+      this.state.quizObject.title + ".json",
+      {
+        type: "application/json"
+      }
+    );
+    var contentUrl = Config.getUrl("quiz");
+
+    uploadFiles([f], contentUrl, undefined)
       .then(res => {
         toast.success("upload success");
         console.log(res.statusText);
@@ -67,33 +116,113 @@ class QuizEditor extends React.Component {
       });
   }
 
+  // update fields which don't require a deep copy (ie only title and description)
+  handleQuizUpdate(event) {
+    // event.persist();
+    var value = event.target.value;
+    var field = event.target.getAttribute("field");
+    this.setState(prevState => {
+      let quizObject = { ...prevState.quizObject }; // creating copy of state variable
+      // need to create a new quiz object which is a DEEP COPY of the empty question template...
+      quizObject[field] = value;
+      console.log(quizObject);
+      return { quizObject }; // return new object
+    });
+  }
+
   render() {
     return (
       <React.Fragment>
-        {this.state.quizObject.quiz_questions.map((quest, index) => {
-          return (
-            <QuizQuestionEditor
-              question={quest}
-              questionNum={index}
-              handleUpdate={this.handleQuestionUpdate}
-            ></QuizQuestionEditor>
-          );
-        })}
-        <button
-          class="btn btn-primary btn-lg btn-block"
-          onClick={this.addNewQuestion}
-        >
-          Add a new question
-        </button>
-        <button
-          class="btn btn-primary btn-lg btn-block"
-          onClick={this.saveQuiz}
-        >
-          Save quiz to server
-        </button>
+        <ToastContainer />
+        <h1> Edit Quiz </h1>
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-md-8 offset-md-2">
+              <form class="form bordered">
+                <h3> Title + Description</h3>
+                <div class="form-group">
+                  <label>Provide a title for the Quiz:</label>
+                  <input
+                    class="form-control"
+                    type="text"
+                    field="title"
+                    // Added the || "" in the 'value' attribute to prevent component becoming uncontrolled when question is initially null:
+                    // Qas getting error  A component is changing an uncontrolled input of type text to be controlled
+                    value={this.state.quizObject.title || ""}
+                    onChange={this.handleQuizUpdate}
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Provide a description for the Quiz:</label>
+                  <input
+                    class="form-control"
+                    type="text"
+                    field="description"
+                    // Added the || "" in the 'value' attribute to prevent component becoming uncontrolled when question is initially null:
+                    // Qas getting error  A component is changing an uncontrolled input of type text to be controlled
+                    value={this.state.quizObject.description || ""}
+                    onChange={this.handleQuizUpdate}
+                  />
+                </div>
+              </form>
+              {this.state.quizObject.quiz_questions.map((quest, index) => {
+                return (
+                  <div class="bordered">
+                    <QuizQuestionEditor
+                      question={quest}
+                      questionNum={index}
+                      handleUpdate={this.handleQuestionUpdate}
+                      handleDelete={this.handleQuestionDelete}
+                    ></QuizQuestionEditor>
+                    <button
+                      question={index}
+                      class="btn btn-primary btn-lg btn-block"
+                      onClick={this.handleQuestionDelete}
+                    >
+                      Delete this Question
+                    </button>
+                    {index !== 0 && (
+                      <button
+                        question={index}
+                        move="up"
+                        class="btn btn-primary btn-lg btn-block"
+                        onClick={this.handleQuestionMove}
+                      >
+                        Move this question up
+                      </button>
+                    )}
+                    {index !==
+                      this.state.quizObject.quiz_questions.length - 1 && (
+                      <button
+                        question={index}
+                        move="down"
+                        class="btn btn-primary btn-lg btn-block"
+                        onClick={this.handleQuestionMove}
+                      >
+                        Move this question down
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+              <button
+                class="btn btn-primary btn-lg btn-block"
+                onClick={this.addNewQuestion}
+              >
+                Add a new question
+              </button>
+              <button
+                class="btn btn-primary btn-lg btn-block"
+                onClick={this.saveQuiz}
+              >
+                Save quiz to server
+              </button>
+            </div>
+          </div>
+        </div>
       </React.Fragment>
     );
   }
 }
 
-export default QuizEditor;
+export default withRouter(QuizEditor);

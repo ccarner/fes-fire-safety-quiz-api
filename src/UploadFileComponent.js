@@ -1,15 +1,16 @@
 import React from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import axios from "axios";
+import { uploadFiles } from "./Utilities.js";
 
 class UploadFileComponent extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedFile: null,
+      selectedFiles: null,
       loaded: 0
     };
+    this.uploadProgressCallback = this.uploadProgressCallback.bind(this);
   }
 
   onChangeHandler = event => {
@@ -23,31 +24,28 @@ class UploadFileComponent extends React.Component {
     ) {
       // if return true allow to setState
       this.setState({
-        selectedFile: files,
+        selectedFiles: files,
         loaded: 0
       });
     }
   };
 
+  uploadProgressCallback(ProgressEvent) {
+    this.setState({
+      loaded: (ProgressEvent.loaded / ProgressEvent.total) * 100
+    });
+  }
+
   // for uploading file
   onClickHandler = () => {
-    if (this.state.selectedFile) {
-      const data = new FormData();
-      for (var x = 0; x < this.state.selectedFile.length; x++) {
-        data.append("file", this.state.selectedFile[x]);
-      }
-      axios
-        .post(this.props.uploadURL, data, {
-          // receive two parameter endpoint url ,form data
-          onUploadProgress: ProgressEvent => {
-            this.setState({
-              loaded: (ProgressEvent.loaded / ProgressEvent.total) * 100
-            });
-          }
-        })
+    if (this.state.selectedFiles) {
+      uploadFiles(
+        this.state.selectedFiles,
+        this.props.uploadURL,
+        this.uploadProgressCallback
+      )
         .then(res => {
           toast.success("upload success");
-          console.log(res.statusText);
           this.props.handleUpdate();
         })
         .catch(err => {
@@ -74,8 +72,9 @@ class UploadFileComponent extends React.Component {
   render() {
     return (
       <React.Fragment>
-        <div class="form-group files">
+        <div class=" bordered form-group files">
           <input
+            id="uploadComponent"
             type="file"
             class="form-control"
             multiple
@@ -95,9 +94,9 @@ class UploadFileComponent extends React.Component {
         </div>
         <button
           type="button"
-          class="btn btn-success btn-block this.state.selectedFile"
+          class="btn btn-success btn-block this.state.selectedFiles"
           onClick={this.onClickHandler}
-          disabled={!this.state.selectedFile}
+          disabled={!this.state.selectedFiles}
         >
           Upload
         </button>

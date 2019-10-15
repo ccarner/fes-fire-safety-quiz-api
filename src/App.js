@@ -4,6 +4,8 @@ import "./App.css";
 import Home from "./home.jsx";
 import NavBar from "./navbar";
 import ContentPage from "./contentPage";
+import QuizEditor from "./quizEditor.jsx";
+import QuizPage from "./quizPage.jsx";
 
 class App extends React.Component {
   render() {
@@ -22,19 +24,16 @@ class App extends React.Component {
           <Switch>
             {/* use a switch so we only render max of ONE of these pages */}
             <Route path="/" exact component={Home} />
+            <Route path="/editQuiz" render={routeProps => <QuizEditor />} />
             {/* including props inside of route,  can get props this way... */}
-            <Route
-              path="/quizzes"
-              render={props => (
-                <ContentPage contentType="quiz" heading="Quizzes" />
-              )}
-            />
+            <Route path="/quizzes" render={props => <QuizPage />} />
             <Route
               path="/modules"
               render={props => (
                 <ContentPage contentType="module" heading="Modules" />
               )}
             />
+
             <Route
               path="/checklists"
               render={props => (

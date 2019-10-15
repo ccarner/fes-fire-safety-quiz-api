@@ -42,6 +42,8 @@ class FileViewer extends React.Component {
                 filename={file.filename}
                 handleView={this.props.handleView}
                 handleDelete={this.props.handleDelete}
+                handleEdit={this.props.handleEdit}
+                handleHide={this.props.handleHide}
               ></FileViewerRow>
             </div>
           ))}

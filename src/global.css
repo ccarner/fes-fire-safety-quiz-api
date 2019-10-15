@@ -26,12 +26,21 @@ a:active {
   text-decoration: none;
 }
 
-.form-control {
+#uploadComponent {
   padding: 20px;
   height: 80px;
-  border: 5px solid #cecece;
 }
 
 #fileViewer {
   border: 5px solid #cecece;
+}
+
+.bordered {
+  border: 5px solid #cecece;
+  padding: 15px;
+  margin: 20px;
+}
+
+#answerCorrectCheckbox {
+  width: 15px;
 }

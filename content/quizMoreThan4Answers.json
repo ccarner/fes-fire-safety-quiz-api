@@ -1,0 +1,43 @@
+{
+  "title": "quiz more than 4 answers test",
+  "description": "this is the 1st test quiz, could have a full description of what you'd be doing in this quiz...",
+  "quiz_questions": [
+    {
+      "question": "What does the white band at the top of the extinghuisher signify?",
+      "answer_index": [2],
+      "media": "img",
+      "media_src": "https://fireandsafetywa.com.au/wp-content/uploads/2018/09/201008.jpg",
+      "answers": [
+        "Water-based",
+        "Powder-based",
+        "Extra heavy",
+        "Foam-based",
+        "something else",
+        "warning",
+        "too many buttons now"
+      ],
+      "max_choices": 1
+    },
+    {
+      "question": "Where should you point the fire extinguisher?",
+      "answer_index": [2],
+      "media": "video",
+      "media_src": "https://media.istockphoto.com/videos/seemless-and-loopable-flames-slow-motion-video-id493922248",
+      "answers": [
+        "top of flame",
+        "bottom of flame",
+        "over the top of flame",
+        "on the floor"
+      ],
+      "max_choices": 2
+    },
+    {
+      "question": "select all buttons",
+      "answer_index": [1, 2, 3, 4],
+      "media": "text",
+      "media_src": "",
+      "answers": ["1", "2", "3", "4", "5", "6"],
+      "max_choices": 4
+    }
+  ]
+}

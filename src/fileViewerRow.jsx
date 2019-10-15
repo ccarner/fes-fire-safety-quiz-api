@@ -10,6 +10,9 @@ import axios from "axios";
 
 class FileViewerRow extends React.Component {
   render() {
+    var hideButtonText = this.props.filename.includes("hidden_")
+      ? "Unhide"
+      : "Hide";
     return (
       <React.Fragment>
         <div class="col-sm-7 col-xs-4 my-auto">{this.props.filename}</div>
@@ -28,6 +31,24 @@ class FileViewerRow extends React.Component {
               color="default"
             >
               Delete
+            </Button>
+          )}
+          {this.props.handleEdit && this.props.filename !== "index.json" && (
+            <Button
+              onClick={() => this.props.handleEdit(this.props.filename)}
+              variant="contained"
+              color="default"
+            >
+              edit
+            </Button>
+          )}{" "}
+          {this.props.handleHide && this.props.filename !== "index.json" && (
+            <Button
+              onClick={() => this.props.handleHide(this.props.filename)}
+              variant="contained"
+              color="default"
+            >
+              {hideButtonText}
             </Button>
           )}
         </div>

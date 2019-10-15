@@ -14,7 +14,9 @@ class ContentPage extends React.Component {
     super(props);
     this.handleView = this.handleView.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
+    this.handleEdit = this.handleEdit.bind(this);
     this.updateIndex = this.updateIndex.bind(this);
+    this.handleHide = this.handleHide.bind(this);
 
     this.state = {
       filesOnServer: null,
@@ -37,10 +39,45 @@ class ContentPage extends React.Component {
         this.setState({
           filesOnServer: data
         });
-        console.log("here inside of contentPage updateIndex");
+        console.log("here inside of contentPage updateIndex", data);
       })
       .catch(err => {
         console.log("error response is", err.response);
+      });
+  }
+
+  handleEdit(filename) {
+    return axios
+      .get(this.state.contentUrl + "/" + filename)
+      .then(response => response.data)
+      .then(data => {
+        this.props.handleEdit(data);
+      })
+      .catch(err => {
+        console.log("error response is", err.response);
+      });
+  }
+
+  handleHide(filename) {
+    const url = new URL(filename, this.state.contentUrl + "/");
+    axios
+      .patch(url)
+      .then(res => {
+        toast.success("Hide success");
+      })
+      .catch(err => {
+        console.log("error response is", err.response, err.response.status);
+        if (err.response.status === 404) {
+          toast.error(
+            "Hide failed: asset does not exist. Please refresh the page"
+          );
+        } else {
+          toast.error("Hide failed, unknown error");
+        }
+      })
+      .finally(() => {
+        // update index
+        this.updateIndex();
       });
   }
 
@@ -83,6 +120,8 @@ class ContentPage extends React.Component {
           index={this.state.filesOnServer}
           handleView={this.handleView}
           handleDelete={this.handleDelete}
+          handleEdit={this.handleEdit}
+          handleHide={this.handleHide}
         ></FileViewer>
       );
     } else {

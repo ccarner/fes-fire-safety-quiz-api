@@ -100,6 +100,7 @@ app.delete(Object.keys(foldersMap), function(req, res) {
       return res.status(400).send(req.file);
     } else {
       console.log("file deleted");
+      updateIndex(path.dirname(req.url));
       return res.status(200).send(req.file);
     }
   };
@@ -108,7 +109,45 @@ app.delete(Object.keys(foldersMap), function(req, res) {
   const asset = path.parse("." + decodeURIComponent(req.url));
   fs.unlink(path.normalize(path.format(asset)), resultHandler);
   console.log("deleted:", path.normalize(path.format(asset)));
-  updateIndex(path.dirname(req.url));
+});
+
+//no data needed, used for hiding vs unhiding
+app.patch(Object.keys(foldersMap), function(req, res) {
+  var resultHandler = function(err) {
+    if (err) {
+      if (err.message.includes("ENOENT")) {
+        console.log("rename failed", err);
+        console.log(req.url);
+        // assume failure is due to resource not found?
+        return res.status(404).send(req.file);
+      }
+      console.log("rename failed", err);
+      // assume failure is due to resource not found?
+
+      return res.status(400).send(req.file);
+    } else {
+      console.log("file renamed");
+      updateIndex(path.dirname(req.url));
+      return res.status(200).send(req.file);
+    }
+  };
+
+  // need to decodeURIcomponent to account for files with spaces that become '%20'
+  var filePath = "." + decodeURIComponent(req.url);
+  var fileName = path.basename(filePath);
+  var fileDir = path.dirname(filePath);
+  if (fileName.includes("_hidden_")) {
+    fileName = fileName.replace("_hidden_", "");
+  } else {
+    fileName = "_hidden_" + fileName;
+  }
+  var newFilePath = fileDir + "/" + fileName;
+
+  fs.rename(
+    path.normalize(filePath),
+    path.normalize(newFilePath),
+    resultHandler
+  );
 });
 
 app.post(Object.keys(foldersMap), function(req, res) {
@@ -119,6 +158,7 @@ app.post(Object.keys(foldersMap), function(req, res) {
     } else if (err) {
       return res.status(500).json(err);
     }
+    console.log("body is", req.body);
     //keep index json updated
     updateIndex(req.url);
     return res.status(200).send(req.file);
