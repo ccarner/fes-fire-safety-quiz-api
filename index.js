@@ -158,7 +158,7 @@ app.post(Object.keys(foldersMap), function(req, res) {
     } else if (err) {
       return res.status(500).json(err);
     }
-    console.log("body is", req.body);
+
     //keep index json updated
     updateIndex(req.url);
     return res.status(200).send(req.file);

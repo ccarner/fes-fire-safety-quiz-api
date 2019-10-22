@@ -4,19 +4,13 @@ import "./App.css";
 import Home from "./home.jsx";
 import NavBar from "./navbar";
 import ContentPage from "./contentPage";
+import ChecklistEditor from "./checklistEditor.jsx";
 import QuizEditor from "./quizEditor.jsx";
 import QuizPage from "./quizPage.jsx";
+import ChecklistPage from "./checklistPage.jsx";
 
 class App extends React.Component {
   render() {
-    // {
-    //   let props = {
-    //     contentTypeQuiz: "quiz",
-    //     contentTypeMedia: "media",
-    //     contentTypeChecklist: "checklist",
-    //     contentTypeModule: "module"
-    //   };
-    // }
     return (
       <BrowserRouter>
         <div className="App">
@@ -24,6 +18,10 @@ class App extends React.Component {
           <Switch>
             {/* use a switch so we only render max of ONE of these pages */}
             <Route path="/" exact component={Home} />
+            <Route
+              path="/editChecklist"
+              render={routeProps => <ChecklistEditor />}
+            />
             <Route path="/editQuiz" render={routeProps => <QuizEditor />} />
             {/* including props inside of route,  can get props this way... */}
             <Route path="/quizzes" render={props => <QuizPage />} />
@@ -34,12 +32,7 @@ class App extends React.Component {
               )}
             />
 
-            <Route
-              path="/checklists"
-              render={props => (
-                <ContentPage contentType="checklist" heading="Checklists" />
-              )}
-            />
+            <Route path="/checklists" render={props => <ChecklistPage />} />
             <Route
               path="/media"
               render={props => (
