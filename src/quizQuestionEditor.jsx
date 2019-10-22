@@ -39,8 +39,8 @@ class QuizQuestionEditor extends React.Component {
     var newAnswerIndex = [];
     for (var i = 0; i < modifiedQuestion.answer_index.length; i++) {
       //don't assume that answers are ordered, eg could be [2,3,1]
-      //remove correct answer if it was in there. +1 since answer numbers start at 1 in the json format
-      if (modifiedQuestion.answer_index[i] > answerIndex + 1) {
+      //remove correct answer if it was in there.
+      if (modifiedQuestion.answer_index[i] > answerIndex) {
         // decrement by one when pushing in, since deleted an answer below it
         // eg answer #1 is deleted, answer #2 becomes answer#1, so need to change the
         // value in answer_index from '2' to '1'
@@ -63,14 +63,14 @@ class QuizQuestionEditor extends React.Component {
     if (event.target.getAttribute("field") === "answer") {
       modifiedQuestion.answers[answerindex] = event.target.value;
     } else if (event.target.getAttribute("field") === "correctAnswer") {
-      console.log("in correctAns", event.target.checked);
+      console.log("in correctAns", event.target.checked, answerindex);
       if (event.target.checked === true) {
         // push answer index +1 since answers start at 1 in the quiz format...
-        modifiedQuestion.answer_index.push(answerindex + 1);
+        modifiedQuestion.answer_index.push(answerindex);
       } else if (event.target.checked === false) {
         // remove the answer index from the list of correct answers
         // need to find index inside answer_index of the answer first
-        var index = modifiedQuestion.answer_index.indexOf(answerindex + 1);
+        var index = modifiedQuestion.answer_index.indexOf(answerindex);
         if (index !== -1) modifiedQuestion.answer_index.splice(index, 1);
       }
     }
@@ -155,9 +155,7 @@ class QuizQuestionEditor extends React.Component {
                       type="checkbox"
                       field="correctAnswer"
                       answerindex={index}
-                      checked={this.props.question.answer_index.includes(
-                        index + 1
-                      )}
+                      checked={this.props.question.answer_index.includes(index)}
                       onChange={this.handleUpdateAnswers}
                     />
                   </div>

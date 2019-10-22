@@ -17,7 +17,7 @@ class QuizEditor extends React.Component {
     this.handleQuizUpdate = this.handleQuizUpdate.bind(this);
     this.emptyQuestion = {
       question: "Type Question Here",
-      answer_index: [1, 2, 3, 4],
+      answer_index: [0, 1, 2, 3],
       media: "text",
       media_src: "",
       answers: ["Option 1", "Option 2", "Option 3", "Option 4"],
