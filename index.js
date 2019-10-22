@@ -234,11 +234,8 @@ function updateIndex(directory) {
             );
             const data = JSON.parse(fileContents);
             var newObj = {};
-            if (data.description !== undefined) {
-              newObj.description = data.description;
-            }
-            if (data.title !== undefined) {
-              newObj.title = data.title;
+            if (data.metadata !== undefined) {
+              newObj.metadata = data.metadata;
             }
             newObj.filename = file;
             indexArray.push(newObj);

@@ -21,7 +21,6 @@ class QuizPage extends React.Component {
 
   render() {
     if (this.state.editingQuiz) {
-      console.log("got here, should be linking...");
       return (
         <Redirect
           push

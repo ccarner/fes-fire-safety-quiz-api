@@ -1,10 +1,12 @@
 {
-  "title": "quiz 1",
-  "description": "this is the 1st test quiz, could have a full description of what you'd be doing in this quiz...",
+  "metadata": {
+    "title": "Quiz 1",
+    "description": "Describe this quiz`"
+  },
   "quiz_questions": [
     {
       "question": "What does the white band at the top of the extinghuisher signify?",
-      "answer_index": [2],
+      "answer_index": [1],
       "media": "img",
       "media_src": "https://fireandsafetywa.com.au/wp-content/uploads/2018/09/201008.jpg",
       "answers": ["Water-based", "Powder-based", "Extra heavy", "Foam-based"],
@@ -12,7 +14,7 @@
     },
     {
       "question": "Where should you point the fire extinguisher?",
-      "answer_index": [2],
+      "answer_index": [1],
       "media": "video",
       "media_src": "https://media.istockphoto.com/videos/seemless-and-loopable-flames-slow-motion-video-id493922248",
       "answers": [
@@ -25,7 +27,7 @@
     },
     {
       "question": "select all buttons",
-      "answer_index": [1, 2, 3, 4],
+      "answer_index": [0, 1, 2, 3],
       "media": "text",
       "media_src": "",
       "answers": ["1", "2", "3", "4"],
