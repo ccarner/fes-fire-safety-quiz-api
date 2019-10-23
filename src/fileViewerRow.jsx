@@ -9,6 +9,17 @@ import axios from "axios";
 // prop with the original JSON of index of the files
 
 class FileViewerRow extends React.Component {
+  renderExtraButtons(buttonType) {
+    let notValid = {
+      module: ["edit"],
+      media: ["edit", "hide"]
+    };
+    let invalid = notValid[this.props.contentType];
+    if (invalid && invalid.includes(buttonType)) {
+      return false;
+    }
+    return true;
+  }
   render() {
     var hideButtonText = this.props.filename.includes("hidden_")
       ? "Unhide"
@@ -21,36 +32,44 @@ class FileViewerRow extends React.Component {
             onClick={() => this.props.handleView(this.props.filename)}
             variant="contained"
             color="default"
+            style={{ margin: 8 }}
           >
             View
           </Button>
-          {this.props.filename !== "index.json" && (
+          {this.props.filename !== "index.json" && this.renderExtraButtons() && (
             <Button
               onClick={() => this.props.handleDelete(this.props.filename)}
               variant="contained"
               color="default"
+              style={{ margin: 8 }}
             >
               Delete
             </Button>
           )}
-          {this.props.handleEdit && this.props.filename !== "index.json" && (
-            <Button
-              onClick={() => this.props.handleEdit(this.props.filename)}
-              variant="contained"
-              color="default"
-            >
-              edit
-            </Button>
-          )}{" "}
-          {this.props.handleHide && this.props.filename !== "index.json" && (
-            <Button
-              onClick={() => this.props.handleHide(this.props.filename)}
-              variant="contained"
-              color="default"
-            >
-              {hideButtonText}
-            </Button>
-          )}
+          {this.props.handleEdit &&
+            this.props.filename !== "index.json" &&
+            this.renderExtraButtons("edit") && (
+              <Button
+                onClick={() => this.props.handleEdit(this.props.filename)}
+                variant="contained"
+                color="default"
+                style={{ margin: 8 }}
+              >
+                edit
+              </Button>
+            )}{" "}
+          {this.props.handleHide &&
+            this.props.filename !== "index.json" &&
+            this.renderExtraButtons("hide") && (
+              <Button
+                onClick={() => this.props.handleHide(this.props.filename)}
+                variant="contained"
+                color="default"
+                style={{ margin: 8 }}
+              >
+                {hideButtonText}
+              </Button>
+            )}
         </div>
       </React.Fragment>
     );

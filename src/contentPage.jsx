@@ -90,14 +90,6 @@ class ContentPage extends React.Component {
       })
       .catch(err => {
         console.log(err);
-        // console.log("error response is", err.response, err.response.status);
-        // if (err.response.status === 404) {
-        //   toast.error(
-        //     "Delete failed: asset does not exist. Please refresh the page"
-        //   );
-        // } else {
-        //   toast.error("Delete failed, unknown error");
-        // }
       })
       .finally(() => {
         // update index
@@ -123,6 +115,7 @@ class ContentPage extends React.Component {
           handleDelete={this.handleDelete}
           handleEdit={this.handleEdit}
           handleHide={this.handleHide}
+          contentType={this.props.contentType}
         ></FileViewer>
       );
     } else {

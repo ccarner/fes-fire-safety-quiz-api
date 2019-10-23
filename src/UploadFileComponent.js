@@ -76,7 +76,7 @@ class UploadFileComponent extends React.Component {
           <input
             id="uploadComponent"
             type="file"
-            class="form-control"
+            class=""
             multiple
             onChange={this.onChangeHandler}
           />
