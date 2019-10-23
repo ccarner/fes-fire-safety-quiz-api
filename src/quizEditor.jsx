@@ -14,7 +14,7 @@ class QuizEditor extends React.Component {
     this.saveQuiz = this.saveQuiz.bind(this);
     this.handleQuestionDelete = this.handleQuestionDelete.bind(this);
     this.handleQuestionMove = this.handleQuestionMove.bind(this);
-    this.handleQuizUpdate = this.handleQuizUpdate.bind(this);
+    this.handleQuizMetadataUpdate = this.handleQuizMetadataUpdate.bind(this);
     this.emptyQuestion = {
       question: "Type Question Here",
       answer_index: [0, 1, 2, 3],
@@ -29,8 +29,10 @@ class QuizEditor extends React.Component {
       this.state = {
         quizObject: {
           quiz_questions: [],
-          title: "New Quiz",
-          description: "New quiz Description"
+          metadata: {
+            title: "New Quiz",
+            description: "New quiz Description"
+          }
         }
       };
     }
@@ -98,7 +100,7 @@ class QuizEditor extends React.Component {
   saveQuiz() {
     var f = new File(
       [JSON.stringify(this.state.quizObject)],
-      this.state.quizObject.title + ".json",
+      this.state.quizObject.metadata.title + ".json",
       {
         type: "application/json"
       }
@@ -117,15 +119,15 @@ class QuizEditor extends React.Component {
   }
 
   // update fields which don't require a deep copy (ie only title and description)
-  handleQuizUpdate(event) {
+  handleQuizMetadataUpdate(event) {
     // event.persist();
     var value = event.target.value;
     var field = event.target.getAttribute("field");
     this.setState(prevState => {
       let quizObject = { ...prevState.quizObject }; // creating copy of state variable
+      quizObject.metadata = { ...prevState.quizObject.metadata };
       // need to create a new quiz object which is a DEEP COPY of the empty question template...
-      quizObject[field] = value;
-      console.log(quizObject);
+      quizObject.metadata[field] = value;
       return { quizObject }; // return new object
     });
   }
@@ -148,8 +150,8 @@ class QuizEditor extends React.Component {
                     field="title"
                     // Added the || "" in the 'value' attribute to prevent component becoming uncontrolled when question is initially null:
                     // Qas getting error  A component is changing an uncontrolled input of type text to be controlled
-                    value={this.state.quizObject.title || ""}
-                    onChange={this.handleQuizUpdate}
+                    value={this.state.quizObject.metadata.title || ""}
+                    onChange={this.handleQuizMetadataUpdate}
                   />
                 </div>
                 <div class="form-group">
@@ -160,8 +162,8 @@ class QuizEditor extends React.Component {
                     field="description"
                     // Added the || "" in the 'value' attribute to prevent component becoming uncontrolled when question is initially null:
                     // Qas getting error  A component is changing an uncontrolled input of type text to be controlled
-                    value={this.state.quizObject.description || ""}
-                    onChange={this.handleQuizUpdate}
+                    value={this.state.quizObject.metadata.description || ""}
+                    onChange={this.handleQuizMetadataUpdate}
                   />
                 </div>
               </form>
@@ -176,7 +178,7 @@ class QuizEditor extends React.Component {
                     ></QuizQuestionEditor>
                     <button
                       question={index}
-                      class="btn btn-primary btn-lg btn-block"
+                      class="btn btn-danger btn-lg btn-block"
                       onClick={this.handleQuestionDelete}
                     >
                       Delete this Question
@@ -185,7 +187,7 @@ class QuizEditor extends React.Component {
                       <button
                         question={index}
                         move="up"
-                        class="btn btn-primary btn-lg btn-block"
+                        class="btn btn-danger btn-lg btn-block"
                         onClick={this.handleQuestionMove}
                       >
                         Move this question up
@@ -196,7 +198,7 @@ class QuizEditor extends React.Component {
                       <button
                         question={index}
                         move="down"
-                        class="btn btn-primary btn-lg btn-block"
+                        class="btn btn-danger btn-lg btn-block"
                         onClick={this.handleQuestionMove}
                       >
                         Move this question down
@@ -206,13 +208,13 @@ class QuizEditor extends React.Component {
                 );
               })}
               <button
-                class="btn btn-primary btn-lg btn-block"
+                class="btn btn-danger btn-lg btn-block"
                 onClick={this.addNewQuestion}
               >
                 Add a new question
               </button>
               <button
-                class="btn btn-primary btn-lg btn-block"
+                class="btn btn-danger btn-lg btn-block"
                 onClick={this.saveQuiz}
               >
                 Save quiz to server

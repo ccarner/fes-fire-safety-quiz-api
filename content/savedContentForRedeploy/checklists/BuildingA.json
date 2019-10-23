@@ -1,0 +1,40 @@
+{
+  "checklist_questions": [
+    {
+      "section_name": "Kitchen",
+      "questions": [
+        {
+          "question": "Keep towels and wipers away from the stove or oven",
+          "help_text": "towels can easily get caught on fire",
+          "media": "text",
+          "media_src": ""
+        },
+        {
+          "question": "Always make sure cooking is attended",
+          "help_text": "",
+          "media": "text",
+          "media_src": ""
+        }
+      ]
+    },
+    {
+      "section_name": "Common areas",
+      "questions": [
+        {
+          "question": "Always make sure there is a fire place in front of a fireplace",
+          "help_text": "Type help text here",
+          "media": "text",
+          "media_src": ""
+        },
+        {
+          "question": "Put candles away from flammables",
+          "help_text": "Type help text here",
+          "media": "text",
+          "media_src": ""
+        }
+      ]
+    }
+  ],
+  "title": "Building_A",
+  "description": ""
+}

@@ -14,7 +14,9 @@ class ChecklistEditor extends React.Component {
     this.handleSectionAdd = this.handleSectionAdd.bind(this);
     this.handleSectionDelete = this.handleSectionDelete.bind(this);
     this.handleSectionMove = this.handleSectionMove.bind(this);
-    this.handleChecklistUpdate = this.handleChecklistUpdate.bind(this);
+    this.handleChecklistMetadataUpdate = this.handleChecklistMetadataUpdate.bind(
+      this
+    );
     this.handleSectionUpdate = this.handleSectionUpdate.bind(this);
 
     this.emptySection = { section_name: "new section", questions: [] };
@@ -29,8 +31,10 @@ class ChecklistEditor extends React.Component {
       this.state = {
         checklistObject: {
           checklist_questions: [],
-          title: "New Checklist",
-          description: "New checklist Description"
+          metadata: {
+            title: "New Checklist",
+            description: "New checklist Description"
+          }
         }
       };
     }
@@ -106,7 +110,7 @@ class ChecklistEditor extends React.Component {
   saveChecklist() {
     var f = new File(
       [JSON.stringify(this.state.checklistObject)],
-      this.state.checklistObject.title + ".json",
+      this.state.checklistObject.metadata.title + ".json",
       {
         type: "application/json"
       }
@@ -124,16 +128,16 @@ class ChecklistEditor extends React.Component {
       });
   }
 
-  // update fields which don't require a deep copy (ie only title and description)
-  handleChecklistUpdate(event) {
+  // update metadata fields which don't require a deep copy (ie only title and description)
+  handleChecklistMetadataUpdate(event) {
     // event.persist();
     var value = event.target.value;
     var field = event.target.getAttribute("field");
     this.setState(prevState => {
       let checklistObject = { ...prevState.checklistObject }; // creating copy of state variable
+      checklistObject.metadata = { ...prevState.checklistObject.metadata };
       // need to create a new checklist object which is a DEEP COPY of the empty question template...
-      checklistObject[field] = value;
-      console.log(checklistObject);
+      checklistObject.metadata[field] = value;
       return { checklistObject }; // return new object
     });
   }
@@ -156,8 +160,8 @@ class ChecklistEditor extends React.Component {
                     field="title"
                     // Added the || "" in the 'value' attribute to prevent component becoming uncontrolled when question is initially null:
                     // Qas getting error  A component is changing an uncontrolled input of type text to be controlled
-                    value={this.state.checklistObject.title || ""}
-                    onChange={this.handleChecklistUpdate}
+                    value={this.state.checklistObject.metadata.title || ""}
+                    onChange={this.handleChecklistMetadataUpdate}
                   />
                 </div>
                 <div class="form-group">
@@ -168,8 +172,10 @@ class ChecklistEditor extends React.Component {
                     field="description"
                     // Added the || "" in the 'value' attribute to prevent component becoming uncontrolled when question is initially null:
                     // Qas getting error  A component is changing an uncontrolled input of type text to be controlled
-                    value={this.state.checklistObject.description || ""}
-                    onChange={this.handleChecklistUpdate}
+                    value={
+                      this.state.checklistObject.metadata.description || ""
+                    }
+                    onChange={this.handleChecklistMetadataUpdate}
                   />
                 </div>
               </form>
@@ -189,7 +195,7 @@ class ChecklistEditor extends React.Component {
                       ></ChecklistSectionEditor>
                       <button
                         section={index}
-                        class="btn btn-primary btn-lg btn-block"
+                        class="btn btn-danger btn-lg btn-block"
                         onClick={this.handleSectionDelete}
                       >
                         Delete this Section
@@ -198,7 +204,7 @@ class ChecklistEditor extends React.Component {
                         <button
                           section={index}
                           move="up"
-                          class="btn btn-primary btn-lg btn-block"
+                          class="btn btn-danger btn-lg btn-block"
                           onClick={this.handleSectionMove}
                         >
                           Move this section up
@@ -210,7 +216,7 @@ class ChecklistEditor extends React.Component {
                         <button
                           section={index}
                           move="down"
-                          class="btn btn-primary btn-lg btn-block"
+                          class="btn btn-danger btn-lg btn-block"
                           onClick={this.handleSectionMove}
                         >
                           Move this section down
@@ -221,13 +227,13 @@ class ChecklistEditor extends React.Component {
                 }
               )}
               <button
-                class="btn btn-primary btn-lg btn-block"
+                class="btn btn-danger btn-lg btn-block"
                 onClick={this.handleSectionAdd}
               >
                 Add a new Section
               </button>
               <button
-                class="btn btn-primary btn-lg btn-block"
+                class="btn btn-danger btn-lg btn-block"
                 onClick={this.saveChecklist}
               >
                 Save checklist to server

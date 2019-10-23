@@ -1,0 +1,40 @@
+{
+  "checklist_questions": [
+    {
+      "section_name": "louge",
+      "questions": [
+        {
+          "question": "Have you changed the smoke alarm's batteries this year",
+          "help_text": "Type help text here",
+          "media": "text",
+          "media_src": ""
+        },
+        {
+          "question": "Have you tested the fire alarms this year",
+          "help_text": "Type help text here",
+          "media": "text",
+          "media_src": ""
+        }
+      ]
+    },
+    {
+      "section_name": "Hallway",
+      "questions": [
+        {
+          "question": "Have you got a fire escaping plan displayed on the Wall",
+          "help_text": "Type help text here",
+          "media": "text",
+          "media_src": ""
+        },
+        {
+          "question": "Make sure every the employee knows the escaping plan well",
+          "help_text": "Type help text here",
+          "media": "text",
+          "media_src": ""
+        }
+      ]
+    }
+  ],
+  "title": "Building_C",
+  "description": "Administration"
+}

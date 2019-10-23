@@ -1,0 +1,40 @@
+{
+  "checklist_questions": [
+    {
+      "section_name": "Bedroom",
+      "questions": [
+        {
+          "question": "Never smoke in the bedroom ",
+          "help_text": "Type help text here",
+          "media": "text",
+          "media_src": ""
+        },
+        {
+          "question": "If you are using a electric blanket, don't leave it on for the entire night",
+          "help_text": "Type help text here",
+          "media": "text",
+          "media_src": ""
+        }
+      ]
+    },
+    {
+      "section_name": "Laundry",
+      "questions": [
+        {
+          "question": "Do not force a dryer to stop before the cooling down cycle completes",
+          "help_text": "Type help text here",
+          "media": "text",
+          "media_src": ""
+        },
+        {
+          "question": "Do not plug in more then three appliances' cords into the same power board",
+          "help_text": "Type help text here",
+          "media": "text",
+          "media_src": ""
+        }
+      ]
+    }
+  ],
+  "title": "Building_B",
+  "description": "Residence"
+}

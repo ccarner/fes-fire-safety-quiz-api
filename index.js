@@ -20,6 +20,8 @@ const app = express();
 app.use(morgan("tiny"));
 //set cors to allow all cross sites to use api (eg localhost:5000)
 app.use(cors());
+app.options("*", cors()); // include before other routes
+cors({ credentials: true, origin: true });
 
 // can visit eg localhost:8000/content to view dir structure
 var serveIndex = require("serve-index");
@@ -83,7 +85,80 @@ var foldersMap = {
   "/content/media*": uploadMedia
 };
 
-app.delete(Object.keys(foldersMap), function(req, res) {
+var users = { FesAdmin: "FesAdminPassword" };
+
+var passport = require("passport"),
+  LocalStrategy = require("passport-local").Strategy;
+var cookieParser = require("cookie-parser");
+var session = require("express-session");
+var bodyParser = require("body-parser");
+app.use(cookieParser());
+app.use(bodyParser());
+app.use(session({ secret: "keyboard cat" }));
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.use(
+  new LocalStrategy(function(username, password, done) {
+    console.log(
+      "username is ",
+      username,
+      "password is",
+      password,
+      "correct password is",
+      users[username]
+    );
+    if (users[username]) {
+      if (users[username] === password) {
+        //success, logged in
+        console.log("Authenticated successfully");
+        return done(null, username);
+      } else {
+        return done(null, false, { message: "Incorrect password." });
+      }
+    } else {
+      //no user exists
+      return done(null, false, { message: "User does not exist" });
+    }
+  })
+);
+
+//used to redirect if not authenticated with passport
+function ensureAuthenticated(req, res, next) {
+  console.log("are we authenticated?");
+  if (req.isAuthenticated()) {
+    console.log("yes we authenticated");
+    return next();
+  }
+  console.log("we not authenticated");
+  res.redirect("/login");
+}
+
+app.get("/login", function(req, res) {
+  res.sendFile(path.join(rootProjectFolder, "/login.html"));
+});
+
+app.get("/logout", function(req, res) {
+  req.logout();
+  res.redirect("/");
+});
+
+app.post("/login", passport.authenticate("local"), function(req, res) {
+  // If this function gets called, authentication was successful.
+  // `req.user` contains the authenticated user.
+  res.redirect("/");
+});
+
+app.delete(Object.keys(foldersMap), ensureAuthenticated, function(req, res) {
+  console.log("!!!!!!!!!!!!!!!recieved a delete");
   console.log("inside delete", req.url);
 
   var resultHandler = function(err) {
@@ -112,7 +187,7 @@ app.delete(Object.keys(foldersMap), function(req, res) {
 });
 
 //no data needed, used for hiding vs unhiding
-app.patch(Object.keys(foldersMap), function(req, res) {
+app.patch(Object.keys(foldersMap), ensureAuthenticated, function(req, res) {
   var resultHandler = function(err) {
     if (err) {
       if (err.message.includes("ENOENT")) {
@@ -165,19 +240,6 @@ app.post(Object.keys(foldersMap), function(req, res) {
   });
 });
 
-// app.post("/content/quizzes", function(req, res) {
-//   uploadQuizzes(req, res, function(err) {
-//     if (err instanceof multer.MulterError) {
-//       return res.status(500).json(err);
-//     } else if (err) {
-//       return res.status(500).json(err);
-//     }
-//     //keep index json updated
-//     updateIndex("/content/quizzes");
-//     return res.status(200).send(req.file);
-//   });
-// });
-
 //intercept requests for the index, and refresh it first.
 app.get("*index.json", function(req, res) {
   //remove the index.json at the end!
@@ -199,6 +261,7 @@ app.get("*index.json", function(req, res) {
 });
 
 // static content checked for last!
+//shows server contents for debugging etc
 app.use(
   "/content",
   express.static("content"),
@@ -206,9 +269,9 @@ app.use(
 );
 
 // for the create-react-app
-app.use("/", express.static(clientBuildFolder));
+app.use("/", ensureAuthenticated, express.static(clientBuildFolder));
 // for the create-react-app
-app.get("*", (req, res) => {
+app.get("*", ensureAuthenticated, (req, res) => {
   console.log("inside catchall " + req.url);
   res.sendFile(path.join(clientBuildFolder, "/index.html"));
 });
@@ -263,153 +326,8 @@ function updateIndex(directory) {
   });
 }
 
-//BELOW IS 1st ASYNC ATTEMPT for 2x functions
-
-// //intercept requests for the index, and refresh it first.
-// app.get("*index.json", function(req, res) {
-//   //remove the index.json at the end!
-//   console.log("url is", req.url);
-//   var newUrl = path.dirname(req.url);
-//   var promise = new Promise(function(resolve, reject) {
-//     updateIndex(newUrl, () => {
-//       resolve("index was updated successfully");
-//     });
-//   });
-
-//   promise.then(function(result) {
-//     res.sendFile(path.normalize(__dirname + req.url), function(err) {
-//       if (err) {
-//         console.log(err);
-//       } else {
-//         console.log("Sent index:", path.normalize(__dirname + req.url));
-//       }
-//     });
-//   });
-// });
-
-// function updateIndex(directory, callback) {
-//   var indexArray = [];
-//   const folder = path.parse("." + directory);
-//   // Loop through all the files in the temp directory
-//   fs.readdir(path.format(folder), function(err, files) {
-//     if (err) {
-//       console.error("Could not list the directory.", err);
-//       process.exit(1);
-//     }
-
-//     files.forEach(function(file, index) {
-//       console.log("inside of updateIndex", file);
-//       // change so that for JSONs, eg quizzes, it will get extra info like content name + information for the quiz page
-//       // var file = JSON.parse(file);
-//       indexArray.push({ filename: file });
-//     });
-
-//     var json = JSON.stringify(indexArray);
-
-//     // add proper callback here
-//     const indexPath = path.join(path.format(folder), "index.json");
-//     fs.writeFile(indexPath, json, function(err) {
-//       if (err) {
-//         return console.log(err);
-//       }
-
-//       console.log("The index was updated!");
-//       callback();
-//     });
-//   });
-// }
-
-///BELOW IS SYNCHRONOUS VERSION
-
-// //intercept requests for the index, and refresh it first.
-// app.get("*index.json", function(req, res) {
-//   //remove the index.json at the end!
-//   console.log("url is", req.url);
-//   var newUrl = path.dirname(req.url);
-//   updateIndex(newUrl);
-//   var stats = fs.statSync(path.normalize(__dirname + req.url));
-//   var fileSizeInBytes = stats["size"];
-
-//   res.set("Content-Length", fileSizeInBytes.toString());
-//   console.log("filesize", fileSizeInBytes.toString());
-//   res.sendFile(path.normalize(__dirname + req.url), function(err) {
-//     if (err) {
-//       console.log(err);
-//     } else {
-//       console.log("Sent index:", path.normalize(__dirname + req.url));
-//     }
-//   });
-// });
-// function updateIndex(directory) {
-//   var indexArray = [];
-//   const folder = path.parse("." + directory);
-//   // Loop through all the files in the temp directory
-//   // used synchronous since otherwise we got race conditions when trying to update
-//   var files = fs.readdirSync(path.format(folder));
-//   files.forEach(file => {
-//     console.log("inside of updateIndex", file);
-//     // change so that for JSONs, eg quizzes, it will get extra info like content name + information for the quiz page
-//     // var file = JSON.parse(file);
-//     indexArray.push({ filename: file });
-//   });
-
-// Create a multer instance and set the destination folder.
-// The code below uses /public folder. You can also assign a new file name upon upload.
-// The code below uses ‘originalfilename’as the file name.
-
-// // Serve static files from the React app
-// app.use("/app", express.static(clientBuildFolder));
-
-// // Put all API endpoints under '/api'
-// app.get("/api/quizzes", (req, res) => {
-//   // Return them as json
-
-//   fs.readFile("content/QuizJson.json", (err, data) => {
-//     if (err) throw err;
-
-//     let quizzes = JSON.parse(data);
-//     res.json(quizzes);
-//     console.log(`Sent quizzes as: \n ${quizzes} `);
-//   });
-// });
-
-// The "catchall" handler: for any request that doesn't
-// match one above, send back React's index.html file.
-
-// app.get("*", (req, res) => {
-//   console.log(
-//     "inside catchall 2" +
-//       req.url +
-//       " new url -app =:" +
-//       req.url.replace("/app", "")
-//   );
-//   res.sendFile(path.join(clientBuildFolder, req.url.replace("/app", "")));
-// });
-
-// app.get("*", (req, res) => {
-//   console.log("inside catchall " + req.url);
-//   res.sendFile(path.join(clientBuildFolder, "/index.html"));
-// });
-
-// console.log(
-//   "dirname is",
-//   __dirname,
-
-//   "root proj folder is",
-//   rootProjectFolder,
-//   "clientbuildfolder is",
-//   clientBuildFolder
-// );
-
-// The "catchall" handler: for any request that doesn't
-// match one above, send back React's index.html file.
-// app.get("*", (req, res) => {
-//   res.sendFile(path.join(clientBuildFolder, "index.html"));
-//   console.log("sent homepage");
-// });
-
 // listens on port that node gives OR 8000 for eg testing
 const port = process.env.PORT || 8000;
 app.listen(port);
 
-console.log(`FES Express listening on ${port}`);
+console.log(`FES Express Server listening on ${port}`);

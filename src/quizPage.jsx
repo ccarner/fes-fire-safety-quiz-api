@@ -40,7 +40,7 @@ class QuizPage extends React.Component {
             handleEdit={this.handleEdit}
           />
           <Link to="/editQuiz">
-            <button class="btn btn-primary btn-lg btn-block">
+            <button class="btn menu-btn btn-danger btn-lg ">
               Create a new Quiz
             </button>
           </Link>

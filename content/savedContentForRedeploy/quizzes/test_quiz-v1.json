@@ -1,0 +1,50 @@
+{
+  "metadata": {
+    "title": "Quiz For Testing",
+    "description": "This is a quiz used solely for testing, should not be viewed by users"
+  },
+  "quiz_questions": [
+    {
+      "question": "Select all 5 buttons below",
+      "answer_index": [0,1,2,3,4],
+      "media": "img",
+      "media_src": "https://fireandsafetywa.com.au/wp-content/uploads/2018/09/201008.jpg",
+      "answers": ["b1","b2","b3","b4","b5"],
+      "max_choices": 5
+    },
+    {
+      "question": "Select the first button",
+      "answer_index": [0],
+      "media": "video",
+      "media_src": "https://media.istockphoto.com/videos/seemless-and-loopable-flames-slow-motion-video-id493922248",
+      "answers": [
+        "b1","b2","b3","b4","b5"
+      ],
+      "max_choices": 1
+    },
+    {
+      "question": "select the last 2 buttons",
+      "answer_index": [3,4],
+      "media": "text",
+      "media_src": "",
+      "answers": ["BUTTON 1", "BUTTON 2", "BUTTON 3", "BUTTON 4", "BUTTON 5"],
+      "max_choices": 3
+    },
+	{
+      "question": "select the first button",
+      "answer_index": [0],
+      "media": "text",
+      "media_src": "",
+      "answers": ["1", "2"],
+      "max_choices": 2
+    },
+	{
+      "question": "select the last button",
+      "answer_index": [1],
+      "media": "text",
+      "media_src": "",
+      "answers": ["1", "2"]
+	  
+    }
+  ]
+}

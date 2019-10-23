@@ -163,7 +163,7 @@ class QuizQuestionEditor extends React.Component {
                     <button
                       type="deleteAnswer"
                       answerindex={index}
-                      class="btn btn-primary btn-lg btn-block"
+                      class="btn btn-danger btn-lg btn-block"
                       onClick={this.handleDeleteAnswer}
                     >
                       Delete this answer
@@ -175,7 +175,7 @@ class QuizQuestionEditor extends React.Component {
           })}
           <button
             type="addAnswer"
-            class="btn btn-primary btn-lg btn-block"
+            class="btn btn-danger btn-lg btn-block"
             onClick={this.handleAddAnswer}
           >
             Add an Answer

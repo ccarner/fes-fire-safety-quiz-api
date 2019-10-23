@@ -48,7 +48,7 @@ class ContentPage extends React.Component {
 
   handleEdit(filename) {
     return axios
-      .get(this.state.contentUrl + "/" + filename)
+      .get(this.state.contentUrl + "/" + filename, { withCredentials: true })
       .then(response => response.data)
       .then(data => {
         this.props.handleEdit(data);
@@ -61,7 +61,7 @@ class ContentPage extends React.Component {
   handleHide(filename) {
     const url = new URL(filename, this.state.contentUrl + "/");
     axios
-      .patch(url)
+      .patch(url, { withCredentials: true })
       .then(res => {
         toast.success("Hide success");
       })
@@ -84,19 +84,20 @@ class ContentPage extends React.Component {
   handleDelete(filename) {
     const url = new URL(filename, this.state.contentUrl + "/");
     axios
-      .delete(url)
+      .delete(url, { withCredentials: true })
       .then(res => {
         toast.success("delete success");
       })
       .catch(err => {
-        console.log("error response is", err.response, err.response.status);
-        if (err.response.status === 404) {
-          toast.error(
-            "Delete failed: asset does not exist. Please refresh the page"
-          );
-        } else {
-          toast.error("Delete failed, unknown error");
-        }
+        console.log(err);
+        // console.log("error response is", err.response, err.response.status);
+        // if (err.response.status === 404) {
+        //   toast.error(
+        //     "Delete failed: asset does not exist. Please refresh the page"
+        //   );
+        // } else {
+        //   toast.error("Delete failed, unknown error");
+        // }
       })
       .finally(() => {
         // update index
@@ -150,7 +151,7 @@ class ContentPage extends React.Component {
               <h3> Files on Server:</h3>
               {this.renderFilePane()}
             </div>
-            <div class="col-lg-4">
+            <div class="col-lg-4 upload-component">
               <h3> Upload new content:</h3>
               <UploadFileComponent
                 uploadURL={this.state.contentUrl}

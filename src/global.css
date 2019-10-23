@@ -1,18 +1,19 @@
-/*modifying the btn-primary*/
+/*modifying the btn-danger*/
 
-.btn-primary {
-  color: #fff;
-  background-color: rgba(255, 0, 0, 0.87);
-  border-color: rgb(59, 58, 58);
-  text-decoration: none;
-  padding-top: 10px;
+.menu-btn {
+  margin-top: 10px;
   margin-bottom: 10px;
 }
-.btn-primary:hover,
-.btn-primary:focus,
-.btn-primary:active,
-.btn-primary.active,
-.open > .dropdown-toggle.btn-primary {
+
+.upload-component {
+  margin: 10px;
+}
+
+.btn-danger:hover,
+.btn-danger:focus,
+.btn-danger:active,
+.btn-danger.active,
+.open > .dropdown-toggle.btn-danger {
   color: #fff;
   background-color: rgb(192, 5, 5);
   border-color: #285e8e;

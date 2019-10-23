@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "Quiz 1",
-    "description": "Describe this quiz`"
+    "title": "Arson Prevention",
+    "description": "This quiz is for people who have completed the Fire Warden Advanced Course at FES. It tests your knowledge on highly advanced concepts related to arson"
   },
   "quiz_questions": [
     {
@@ -26,12 +26,11 @@
       "max_choices": 2
     },
     {
-      "question": "select all buttons",
-      "answer_index": [0, 1, 2, 3],
+      "question": "Should you use the extinguisher when the arrow is not inside the green section of the dial?",
+      "answer_index": [0],
       "media": "text",
       "media_src": "",
-      "answers": ["1", "2", "3", "4"],
-      "max_choices": 4
+      "answers": ["yes"]
     }
   ]
 }

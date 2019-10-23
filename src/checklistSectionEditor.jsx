@@ -133,7 +133,7 @@ class ChecklistSectionEditor extends React.Component {
                   <button
                     type="deleteQuestion"
                     questionindex={index}
-                    class="btn btn-primary btn-lg btn-block"
+                    class="btn btn-danger btn-lg btn-block"
                     onClick={this.handleQuestionDelete}
                   >
                     Delete this Question
@@ -145,7 +145,7 @@ class ChecklistSectionEditor extends React.Component {
 
           <button
             type="addQuestion"
-            class="btn btn-primary btn-lg btn-block"
+            class="btn btn-danger btn-lg btn-block"
             onClick={this.handleQuestionAdd}
           >
             Add a Question
