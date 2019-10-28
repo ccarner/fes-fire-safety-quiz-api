@@ -1,14 +1,13 @@
 import React from "react";
-import UploadFileComponent from "./UploadFileComponent.js";
-import FileViewer from "./fileViewer.jsx";
-import { makeStyles } from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
-import { Link } from "react-router-dom";
+import { UploadFileComponent } from "../fileUpload";
+import { FileViewer } from "../fileViewer";
 import axios from "axios";
-import Config from "./config.js";
-import { ToastContainer, toast } from "react-toastify";
+import { Config } from "../../utils";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+/* generic page for showing a file uploader + a fiew viewer.
+  takes in the content type as a prop and determines the API url to use based on that */
 class ContentPage extends React.Component {
   constructor(props) {
     super(props);
@@ -28,6 +27,8 @@ class ContentPage extends React.Component {
     this.updateIndex();
   }
 
+  // after executing some action (eg deleting/uploading) get a fresh copy
+  // of the index from the server
   updateIndex() {
     axios
       .get(this.state.contentUrl + "/" + Config.getIndexFileName())
@@ -39,13 +40,13 @@ class ContentPage extends React.Component {
         this.setState({
           filesOnServer: data
         });
-        console.log("here inside of contentPage updateIndex", data);
       })
       .catch(err => {
-        console.log("error response is", err.response);
+        console.error("error response is", err.response);
       });
   }
 
+  // 'edit' a file, if applicable (eg for quizzes/checklists)
   handleEdit(filename) {
     return axios
       .get(this.state.contentUrl + "/" + filename, { withCredentials: true })
@@ -54,10 +55,11 @@ class ContentPage extends React.Component {
         this.props.handleEdit(data);
       })
       .catch(err => {
-        console.log("error response is", err.response);
+        console.error("error response is", err.response);
       });
   }
 
+  //hide the file, uses an HTTP patch request
   handleHide(filename) {
     const url = new URL(filename, this.state.contentUrl + "/");
     axios
@@ -66,7 +68,7 @@ class ContentPage extends React.Component {
         toast.success("Hide success");
       })
       .catch(err => {
-        console.log("error response is", err.response, err.response.status);
+        console.error("error response is", err.response, err.response.status);
         if (err.response.status === 404) {
           toast.error(
             "Hide failed: asset does not exist. Please refresh the page"
@@ -81,6 +83,7 @@ class ContentPage extends React.Component {
       });
   }
 
+  // delete a file from the server
   handleDelete(filename) {
     const url = new URL(filename, this.state.contentUrl + "/");
     axios
@@ -89,7 +92,7 @@ class ContentPage extends React.Component {
         toast.success("delete success");
       })
       .catch(err => {
-        console.log(err);
+        console.error(err);
       })
       .finally(() => {
         // update index
@@ -97,14 +100,15 @@ class ContentPage extends React.Component {
       });
   }
 
+  // view the fiole in a new tab
   handleView(filename) {
     // note had to bind THIS in the constructor!
     const url = new URL(filename, this.state.contentUrl + "/");
     window.open(url);
   }
 
-  //only render after promise returned
   renderFilePane() {
+    //only render after promise returned for fetching the index
     if (this.state.filesOnServer) {
       return (
         <FileViewer
@@ -119,6 +123,7 @@ class ContentPage extends React.Component {
         ></FileViewer>
       );
     } else {
+      // promise not resolved, loading...
       return (
         <React.Fragment>
           <div class="spinner-border" role="status">
@@ -140,11 +145,11 @@ class ContentPage extends React.Component {
             </div>
           </div>
           <div class="row">
-            <div class="col-lg-4 offset-lg-2">
+            <div class="col-xl-5 offset-xl-1">
               <h3> Files on Server:</h3>
               {this.renderFilePane()}
             </div>
-            <div class="col-lg-4 upload-component">
+            <div class="col-xl-5 upload-component">
               <h3> Upload new content:</h3>
               <UploadFileComponent
                 uploadURL={this.state.contentUrl}

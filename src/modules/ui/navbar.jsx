@@ -1,9 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import logo from "./assets/logo.png";
+import logo from "../../assets/logo.png";
 
-// a stateless functional component in react... since only from props etc
-// pass props as arg and don't use 'this'
+/* Navbar for the application. A stateless functional component */
 const NavBar = props => {
   return (
     <nav className="navbar navbar-dark bg-dark">

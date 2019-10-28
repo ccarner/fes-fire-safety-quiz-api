@@ -1,14 +1,12 @@
 import React from "react";
-import UploadFileComponent from "./UploadFileComponent.js";
-import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
-import { Link } from "react-router-dom";
-import axios from "axios";
 
 // give it a prop of the directory (so can delete/download) and also
 // prop with the original JSON of index of the files
 
+/* display for one single file on the server, used in the fileViewer */
 class FileViewerRow extends React.Component {
+  // logic to render controls available given the page we're currently on
   renderExtraButtons(buttonType) {
     let notValid = {
       module: ["edit"],
@@ -20,14 +18,17 @@ class FileViewerRow extends React.Component {
     }
     return true;
   }
+
   render() {
+    //option to hide/unhide depending on the name (note the same command is sent to API either way, its a toggle)
     var hideButtonText = this.props.filename.includes("hidden_")
       ? "Unhide"
       : "Hide";
+
     return (
       <React.Fragment>
-        <div class="col-sm-7 col-xs-4 my-auto">{this.props.filename}</div>
-        <div class="col-sm-5 col-xs-8 my-auto">
+        <div class="col-sm-6 col-xs-4 my-auto">{this.props.filename}</div>
+        <div class="col-sm-6 col-xs-8 my-auto">
           <Button
             onClick={() => this.props.handleView(this.props.filename)}
             variant="contained"

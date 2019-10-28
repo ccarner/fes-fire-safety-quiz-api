@@ -1,6 +1,7 @@
 import React from "react";
 import ChecklistQuestionEditor from "./checklistQuestionEditor.jsx";
 
+/* used by checklistEditor to edit a single section. A stateless component */
 class ChecklistSectionEditor extends React.Component {
   constructor(props) {
     super(props);
@@ -27,29 +28,24 @@ class ChecklistSectionEditor extends React.Component {
     return modifiedSection;
   }
 
-  //for editing the section name essentially
+  /* a property of the section was updated (eg section name), pass it up to the checklistEditor*/
   handleUpdate(event) {
     event.preventDefault();
     var modifiedSection = this.createSectionCopy(); // creating copy of prop
     // event.target returns a DOM element, use getAttribute to get the attribute (value and id and possibly name are automatically mapped
     // so can just say event.target.value)
     modifiedSection[event.target.getAttribute("field")] = event.target.value; // update the name property, assign a new value
-    console.log(
-      "name ios",
-      modifiedSection["section_name"],
-      "originally was",
-      this.props.section.section_name
-    );
     this.props.handleSectionUpdate(this.props.sectionNum, modifiedSection);
   }
 
+  /* question was updated, pass it up to the checklistEditor*/
   handleQuestionUpdate(questionNumber, newQuestion) {
     let newSection = this.createSectionCopy(); // creating copy of state variable
-
     newSection.questions[questionNumber] = newQuestion;
     this.props.handleSectionUpdate(this.props.sectionNum, newSection);
   }
 
+  /* question was deleted, pass it up to the checklistEditor*/
   handleQuestionDelete(event) {
     event.preventDefault();
     let questionNumber = event.target.getAttribute("questionindex");
@@ -60,6 +56,7 @@ class ChecklistSectionEditor extends React.Component {
     this.props.handleSectionUpdate(this.props.sectionNum, newSection);
   }
 
+  /* question was moved, pass it up to the checklistEditor*/
   handleQuestionMove(event) {
     event.preventDefault();
     let questionNumber = parseInt(event.target.getAttribute("question"));
@@ -93,13 +90,13 @@ class ChecklistSectionEditor extends React.Component {
     });
   }
 
+  /* question was added, pass it up to the checklistEditor*/
   handleQuestionAdd(event) {
     event.preventDefault();
     let newSection = this.createSectionCopy(); // creating copy of state variable
     var newQuestion = { ...this.emptyQuestion };
 
     newSection.questions.push(newQuestion);
-    console.log("newsection is:", newSection);
     this.props.handleSectionUpdate(this.props.sectionNum, newSection);
   }
 

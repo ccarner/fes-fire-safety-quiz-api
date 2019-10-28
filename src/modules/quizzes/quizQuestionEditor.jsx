@@ -1,5 +1,6 @@
 import React from "react";
 
+/* used by quizEditor to edit a single question. A stateless component */
 class QuizQuestionEditor extends React.Component {
   constructor(props) {
     super(props);
@@ -11,6 +12,8 @@ class QuizQuestionEditor extends React.Component {
   }
 
   //used to make copy of the prop so can edit it and return for updating
+  // creates a deep copy, ie copies all answer options + correct answer indexes
+  // rather than leave them as references
   createQuestionDeepCopy() {
     var modifiedQuestion = { ...this.props.question }; // creating copy of prop
     modifiedQuestion.answers = [...this.props.question.answers]; // create deep copy
@@ -18,6 +21,7 @@ class QuizQuestionEditor extends React.Component {
     return modifiedQuestion;
   }
 
+  // a root-level property of the question was changed (eg 'media' or 'question' ) , pass it up to the quizEditor
   handleUpdate(event) {
     var modifiedQuestion = this.createQuestionDeepCopy(); // creating copy of prop
     // event.target returns a DOM element, use getAttribute to get the attribute (value and id and possibly name are automatically mapped
@@ -26,6 +30,7 @@ class QuizQuestionEditor extends React.Component {
     this.props.handleUpdate(this.props.questionNum, modifiedQuestion);
   }
 
+  // an answer was deleted, pass it up to the quizEditor
   handleDeleteAnswer(event) {
     // button inside of form, don't want to 'submit' it, so need to preventDEfault
     event.preventDefault();
@@ -55,6 +60,7 @@ class QuizQuestionEditor extends React.Component {
     this.props.handleUpdate(this.props.questionNum, modifiedQuestion);
   }
 
+  // answer texts or 'correct' answers were updated, pass it up to the quizEditor
   handleUpdateAnswers(event) {
     var modifiedQuestion = this.createQuestionDeepCopy();
     // event.target returns a DOM element, use getAttribute to get the attribute (value and id and possibly name are automatically mapped
@@ -63,7 +69,6 @@ class QuizQuestionEditor extends React.Component {
     if (event.target.getAttribute("field") === "answer") {
       modifiedQuestion.answers[answerindex] = event.target.value;
     } else if (event.target.getAttribute("field") === "correctAnswer") {
-      console.log("in correctAns", event.target.checked, answerindex);
       if (event.target.checked === true) {
         // push answer index +1 since answers start at 1 in the quiz format...
         modifiedQuestion.answer_index.push(answerindex);
@@ -75,9 +80,9 @@ class QuizQuestionEditor extends React.Component {
       }
     }
     this.props.handleUpdate(this.props.questionNum, modifiedQuestion);
-    console.log(modifiedQuestion);
   }
 
+  // answers were added, pass it up to the quizEditor
   handleAddAnswer(event) {
     event.preventDefault();
     var modifiedQuestion = this.createQuestionDeepCopy();

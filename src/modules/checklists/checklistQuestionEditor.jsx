@@ -1,6 +1,7 @@
 import React from "react";
 
-class QuizQuestionEditor extends React.Component {
+/* Used by the checklistEditor/checklistSectionEditor for individual questions. A stateless component */
+class ChecklistQuestionEditor extends React.Component {
   constructor(props) {
     super(props);
     this.handleUpdate = this.handleUpdate.bind(this);
@@ -84,4 +85,4 @@ class QuizQuestionEditor extends React.Component {
   }
 }
 
-export default QuizQuestionEditor;
+export default ChecklistQuestionEditor;

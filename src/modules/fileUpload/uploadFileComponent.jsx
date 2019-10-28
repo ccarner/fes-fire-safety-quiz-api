@@ -1,8 +1,10 @@
 import React from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { uploadFiles } from "./Utilities.js";
+import { uploadFiles } from "../../utils";
 
+/* react component used to display a file uploader and progress bar.
+ Can upload multiple files to the API server at once */
 class UploadFileComponent extends React.Component {
   constructor(props) {
     super(props);
@@ -17,7 +19,8 @@ class UploadFileComponent extends React.Component {
     var files = event.target.files;
     if (
       this.maxSelectFile(event)
-      // only implemented max fiel numebr chacker, doesn't care about size etc
+      // only implemented max field numebr checker, doesn't care about size etc
+      // but could add those as below:
       // &&
       // this.checkMimeType(event) &&
       // this.checkFileSize(event)
@@ -30,6 +33,7 @@ class UploadFileComponent extends React.Component {
     }
   };
 
+  /* used to update the progress bar */
   uploadProgressCallback(ProgressEvent) {
     this.setState({
       loaded: (ProgressEvent.loaded / ProgressEvent.total) * 100
@@ -49,7 +53,7 @@ class UploadFileComponent extends React.Component {
           this.props.handleUpdate();
         })
         .catch(err => {
-          console.log(err);
+          console.error(err);
           toast.error("upload fail");
         });
     } else {
@@ -57,12 +61,12 @@ class UploadFileComponent extends React.Component {
     }
   };
 
+  /* set a maximum number of files to upload to prevent accidental mass uploads */
   maxSelectFile = event => {
     let files = event.target.files; // create file object
     if (files.length > 10) {
       const msg = "Only 10 files can be uploaded at a time";
       event.target.value = null; // discard selected file
-      console.log(msg);
       alert(msg);
       return false;
     }

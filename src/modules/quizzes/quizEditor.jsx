@@ -2,10 +2,11 @@ import React from "react";
 import QuizQuestionEditor from "./quizQuestionEditor.jsx";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Config from "./config.js";
-import { uploadFiles } from "./Utilities";
+import { Config } from "../../utils";
+import { uploadFiles } from "../../utils";
 import { withRouter } from "react-router";
 
+/* Entry class for creating/ editing a quiz. Single source of truth for quiz state*/
 class QuizEditor extends React.Component {
   constructor(props) {
     super(props);
@@ -15,6 +16,7 @@ class QuizEditor extends React.Component {
     this.handleQuestionDelete = this.handleQuestionDelete.bind(this);
     this.handleQuestionMove = this.handleQuestionMove.bind(this);
     this.handleQuizMetadataUpdate = this.handleQuizMetadataUpdate.bind(this);
+    // template for when a new question is added
     this.emptyQuestion = {
       question: "Type Question Here",
       answer_index: [0, 1, 2, 3],
@@ -23,9 +25,13 @@ class QuizEditor extends React.Component {
       answers: ["Option 1", "Option 2", "Option 3", "Option 4"],
       max_choices: 4
     };
+
+    // this component can be used for editing an existing quiz or creating a new one
     try {
+      // for 'editing' an existing quiz
       this.state = { quizObject: this.props.location.state.quizEditing };
     } catch (err) {
+      // making a new one instead...
       this.state = {
         quizObject: {
           quiz_questions: [],
@@ -38,6 +44,7 @@ class QuizEditor extends React.Component {
     }
   }
 
+  //question was modified, update it
   handleQuestionUpdate(questionNumber, newQuestion) {
     this.setState(prevState => {
       let quizObject = { ...prevState.quizObject }; // creating copy of state variable
@@ -46,6 +53,7 @@ class QuizEditor extends React.Component {
     });
   }
 
+  //question was deleted, update state
   handleQuestionDelete(event) {
     let questionNumber = event.target.getAttribute("question");
     this.setState(prevState => {
@@ -58,6 +66,7 @@ class QuizEditor extends React.Component {
     });
   }
 
+  //question was moved, update state
   handleQuestionMove(event) {
     let questionNumber = parseInt(event.target.getAttribute("question"));
     var swapQuestionNumber;
@@ -66,18 +75,22 @@ class QuizEditor extends React.Component {
     } else {
       swapQuestionNumber = questionNumber - 1;
     }
-    console.log("before", this.state.quizObject);
+
     this.setState(prevState => {
       let quizObject = { ...prevState.quizObject };
+      //swap the questions, need a temp var
       var temp = quizObject.quiz_questions[questionNumber];
+
       quizObject.quiz_questions[questionNumber] =
         quizObject.quiz_questions[swapQuestionNumber];
+
       quizObject.quiz_questions[swapQuestionNumber] = temp;
-      console.log("after", quizObject);
+
       return { quizObject }; // return new object
     });
   }
 
+  // new question added, update state
   addNewQuestion() {
     this.setState(prevState => {
       let quizObject = { ...prevState.quizObject }; // creating copy of state variable
@@ -91,12 +104,7 @@ class QuizEditor extends React.Component {
     });
   }
 
-  uploadProgressCallback(ProgressEvent) {
-    this.setState({
-      loaded: (ProgressEvent.loaded / ProgressEvent.total) * 100
-    });
-  }
-
+  //save quiz to server
   saveQuiz() {
     var f = new File(
       [JSON.stringify(this.state.quizObject)],
@@ -110,10 +118,9 @@ class QuizEditor extends React.Component {
     uploadFiles([f], contentUrl, undefined)
       .then(res => {
         toast.success("upload success");
-        console.log(res.statusText);
       })
       .catch(err => {
-        console.log(err);
+        console.error(err);
         toast.error("upload fail");
       });
   }
@@ -227,4 +234,5 @@ class QuizEditor extends React.Component {
   }
 }
 
+//withrouter so that can pass in details via a separate route
 export default withRouter(QuizEditor);

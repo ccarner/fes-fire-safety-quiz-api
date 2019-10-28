@@ -1,15 +1,15 @@
 import React from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Config from "./config.js";
-import { uploadFiles } from "./Utilities";
+import { Config } from "../../utils";
+import { uploadFiles } from "../../utils";
 import { withRouter } from "react-router";
 import ChecklistSectionEditor from "./checklistSectionEditor.jsx";
 
+/* Entry class for creating/ editing a checklist. Single source of truth for checklist state */
 class ChecklistEditor extends React.Component {
   constructor(props) {
     super(props);
-
     this.saveChecklist = this.saveChecklist.bind(this);
     this.handleSectionAdd = this.handleSectionAdd.bind(this);
     this.handleSectionDelete = this.handleSectionDelete.bind(this);
@@ -18,9 +18,10 @@ class ChecklistEditor extends React.Component {
       this
     );
     this.handleSectionUpdate = this.handleSectionUpdate.bind(this);
-
+    // template for when a new section is added
     this.emptySection = { section_name: "new section", questions: [] };
 
+    // this component can be used for editing an existing checklist or creating a new one
     try {
       // for 'editing' an existing checklist
       this.state = {
@@ -40,15 +41,16 @@ class ChecklistEditor extends React.Component {
     }
   }
 
+  // section was modified, update it
   handleSectionUpdate(sectionNumber, newSection) {
     this.setState(prevState => {
       let newChecklistObject = prevState.checklistObject;
       newChecklistObject.checklist_questions[sectionNumber] = newSection;
-      console.log(newChecklistObject);
       return { checklistObject: newChecklistObject };
     });
   }
 
+  // section was deleted, update the state
   handleSectionDelete(event) {
     event.preventDefault();
     let sectionNumber = event.target.getAttribute("section");
@@ -62,6 +64,7 @@ class ChecklistEditor extends React.Component {
     });
   }
 
+  //section was added, update the state
   handleSectionAdd(event) {
     event.preventDefault();
     this.setState(prevState => {
@@ -74,6 +77,7 @@ class ChecklistEditor extends React.Component {
     });
   }
 
+  //section was moved, update the state
   handleSectionMove(event) {
     event.preventDefault();
 
@@ -93,20 +97,12 @@ class ChecklistEditor extends React.Component {
         checklistObject["checklist_questions"][swapSectionNumber];
 
       checklistObject["checklist_questions"][swapSectionNumber] = temp;
-      console.log("after the move, what does it look like?", checklistObject);
 
       return { checklistObject }; // return new object
     });
   }
 
-  //TODO is this needed? also one in the checklistEditor too!
-  //really should put this in another ocmponent I think...
-  uploadProgressCallback(ProgressEvent) {
-    this.setState({
-      loaded: (ProgressEvent.loaded / ProgressEvent.total) * 100
-    });
-  }
-
+  // save the checklist to the server
   saveChecklist() {
     var f = new File(
       [JSON.stringify(this.state.checklistObject)],
@@ -116,14 +112,12 @@ class ChecklistEditor extends React.Component {
       }
     );
     var contentUrl = Config.getUrl("checklist");
-
     uploadFiles([f], contentUrl, undefined)
       .then(res => {
         toast.success("upload success");
-        console.log(res.statusText);
       })
       .catch(err => {
-        console.log(err);
+        console.error(err);
         toast.error("upload fail");
       });
   }
@@ -183,11 +177,6 @@ class ChecklistEditor extends React.Component {
                 (section, index) => {
                   return (
                     <div class="bordered">
-                      {console.log(
-                        "making a new section editor",
-                        section,
-                        index
-                      )}
                       <ChecklistSectionEditor
                         section={section}
                         sectionNum={index}
@@ -246,4 +235,5 @@ class ChecklistEditor extends React.Component {
   }
 }
 
+//withrouter so that can pass in details via a separate route
 export default withRouter(ChecklistEditor);

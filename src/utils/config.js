@@ -1,3 +1,6 @@
+/*  This class is used by the application modules to get the API URLs etc.
+    Provides a central way to change these URLs in the event that the server
+    is modified */
 class Config {
   static getUrl(type) {
     switch (type) {
@@ -30,15 +33,22 @@ class Config {
   }
 }
 
-//static properties
+/* static properties of the class */
+
+// the application requires the URL of the API to be passed in as an environment variable,
+// if not passed in, it will use the development localhost url
 Config.serverUrl =
   process.env.REACT_APP_PRODUCTION_URL || "http://localhost:8000";
+
+// where the content is stored on the server
 Config.urls = {
   quiz: "/content/quizzes",
   media: "/content/media",
   modules: "/content/modules",
   checklists: "/content/checklists"
 };
+
+// what the index is called in each content folder in the server
 Config.IndexFileName = "index.json";
 
 export default Config;

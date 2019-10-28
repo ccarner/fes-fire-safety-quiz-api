@@ -1,4 +1,6 @@
 import axios from "axios";
+
+// used to upload files to a server
 export function uploadFiles(fileArray, url, progressCallback) {
   const data = new FormData();
   //used for allowing multiple uploads (selected file can be an array!

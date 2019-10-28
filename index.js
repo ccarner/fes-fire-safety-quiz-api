@@ -1,36 +1,49 @@
+/* This is the express server code. Express does double duty:
+  1) hosts the CMS Create React App
+  2) serves files / modifies them (Provides the API)
+*/
+
 const express = require("express");
 // logging
 const morgan = require("morgan");
 const cors = require("cors");
-
 //multer helps handle files
-var multer = require("multer");
-
+const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
-const url = require("url");
-
-// gets the dir string to ROOT of project (ie up one folder)
+// gets the dir string to root of project, names it so more understandable
 const rootProjectFolder = __dirname;
+// name of the folder containing the CRA files once we 'build'
 const appBuildFolder = "/build";
+//location of the build folder
 const clientBuildFolder = path.join(rootProjectFolder, appBuildFolder);
+// can visit eg serverURL/content to view dir structure, helpful for debugging
+var serveIndex = require("serve-index");
 
+// users for the application
+var users = { FesAdmin: "FesAdminPassword" };
+
+var passport = require("passport"),
+  LocalStrategy = require("passport-local").Strategy;
+var cookieParser = require("cookie-parser");
+var session = require("express-session");
+var bodyParser = require("body-parser");
+
+// starting express
 const app = express();
-
 app.use(morgan("tiny"));
+
 //set cors to allow all cross sites to use api (eg localhost:5000)
 app.use(cors());
 app.options("*", cors()); // include before other routes
 cors({ credentials: true, origin: true });
 
-// can visit eg localhost:8000/content to view dir structure
-var serveIndex = require("serve-index");
-
-//NOTE the 'post' methods need to be located above the static retrieval methods,
-// else get a 405 error since tries to 'get' put its 'post' request
+/*-----------------------Configure Multer (Storage)---------------------------*/
+//configure storage for multer (file storage wrapper)
+//one multer storage per content folder.
 var quizStorage = multer.diskStorage({
   destination: function(req, file, cb) {
-    cb(console.log("error with destination in multer"), "content/quizzes");
+    cb(console.error("error with destination in multer"), "content/quizzes");
   },
   filename: function(req, file, cb) {
     cb(null, Date.now() + "-" + file.originalname);
@@ -39,11 +52,11 @@ var quizStorage = multer.diskStorage({
 
 var mediaStorage = multer.diskStorage({
   destination: function(req, file, cb) {
-    cb(console.log("error with destination in multer"), "content/media");
+    cb(console.error("error with destination in multer"), "content/media");
   },
   filename: function(req, file, cb) {
     cb(
-      console.log("error with filename in multer"),
+      console.error("error with filename in multer"),
       Date.now() + "-" + file.originalname
     );
   }
@@ -51,11 +64,11 @@ var mediaStorage = multer.diskStorage({
 
 var moduleStorage = multer.diskStorage({
   destination: function(req, file, cb) {
-    cb(console.log("error with destination in multer"), "content/modules");
+    cb(console.error("error with destination in multer"), "content/modules");
   },
   filename: function(req, file, cb) {
     cb(
-      console.log("error with filename in multer"),
+      console.error("error with filename in multer"),
       Date.now() + "-" + file.originalname
     );
   }
@@ -63,11 +76,11 @@ var moduleStorage = multer.diskStorage({
 
 var checklistStorage = multer.diskStorage({
   destination: function(req, file, cb) {
-    cb(console.log("error with destination in multer"), "content/checklists");
+    cb(console.error("error with destination in multer"), "content/checklists");
   },
   filename: function(req, file, cb) {
     cb(
-      console.log("error with filename in multer"),
+      console.error("error with filename in multer"),
       Date.now() + "-" + file.originalname
     );
   }
@@ -78,6 +91,7 @@ var uploadModules = multer({ storage: moduleStorage }).array("file");
 var uploadChecklists = multer({ storage: checklistStorage }).array("file");
 var uploadMedia = multer({ storage: mediaStorage }).array("file");
 
+// contains all accessible content folders, and the associated multer storage
 var foldersMap = {
   "/content/quizzes*": uploadQuizzes,
   "/content/modules*": uploadModules,
@@ -85,19 +99,14 @@ var foldersMap = {
   "/content/media*": uploadMedia
 };
 
-var users = { FesAdmin: "FesAdminPassword" };
-
-var passport = require("passport"),
-  LocalStrategy = require("passport-local").Strategy;
-var cookieParser = require("cookie-parser");
-var session = require("express-session");
-var bodyParser = require("body-parser");
+/*----------------Configure Passport.js (authentication) ---------------------*/
 app.use(cookieParser());
 app.use(bodyParser());
 app.use(session({ secret: "keyboard cat" }));
 app.use(passport.initialize());
 app.use(passport.session());
 
+//serialising/deserialisng user function is required, trivial for this case
 passport.serializeUser(function(user, done) {
   done(null, user);
 });
@@ -106,20 +115,13 @@ passport.deserializeUser(function(user, done) {
   done(null, user);
 });
 
+// set up the strategy to use. This is where you'd replace the strategy with
+// one that used a database with users if you wanted to do so
 passport.use(
   new LocalStrategy(function(username, password, done) {
-    console.log(
-      "username is ",
-      username,
-      "password is",
-      password,
-      "correct password is",
-      users[username]
-    );
     if (users[username]) {
       if (users[username] === password) {
         //success, logged in
-        console.log("Authenticated successfully");
         return done(null, username);
       } else {
         return done(null, false, { message: "Incorrect password." });
@@ -133,22 +135,23 @@ passport.use(
 
 //used to redirect if not authenticated with passport
 function ensureAuthenticated(req, res, next) {
-  console.log("are we authenticated?");
   if (req.isAuthenticated()) {
-    console.log("yes we authenticated");
     return next();
   }
-  console.log("we not authenticated");
   res.redirect("/login");
 }
 
+/*-------------------------Express Routing -----------------------------------*/
+// key API routes are protected with the ensureAuthenticated function (using passport.js)
+// 'get' routes for content folders are not protected, get routes for CRA files are
+
+//login.logout pages
 app.get("/login", function(req, res) {
   res.sendFile(path.join(rootProjectFolder, "/login.html"));
 });
-
 app.get("/logout", function(req, res) {
   req.logout();
-  res.redirect("/");
+  res.redirect("/login");
 });
 
 app.post("/login", passport.authenticate("local"), function(req, res) {
@@ -157,24 +160,20 @@ app.post("/login", passport.authenticate("local"), function(req, res) {
   res.redirect("/");
 });
 
+//delete a content file from the server
 app.delete(Object.keys(foldersMap), ensureAuthenticated, function(req, res) {
-  console.log("!!!!!!!!!!!!!!!recieved a delete");
-  console.log("inside delete", req.url);
-
   var resultHandler = function(err) {
     if (err) {
       if (err.message.includes("ENOENT")) {
-        console.log("unlink failed", err);
-        console.log(req.url);
+        console.error("unlink failed", err);
         // assume failure is due to resource not found?
         return res.status(404).send(req.file);
       }
-      console.log("unlink failed", err);
+      console.error("unlink failed", err);
       // assume failure is due to resource not found?
 
       return res.status(400).send(req.file);
     } else {
-      console.log("file deleted");
       updateIndex(path.dirname(req.url));
       return res.status(200).send(req.file);
     }
@@ -183,7 +182,6 @@ app.delete(Object.keys(foldersMap), ensureAuthenticated, function(req, res) {
   // need to decodeURIcomponent to account for files with spaces that become '%20'
   const asset = path.parse("." + decodeURIComponent(req.url));
   fs.unlink(path.normalize(path.format(asset)), resultHandler);
-  console.log("deleted:", path.normalize(path.format(asset)));
 });
 
 //no data needed, used for hiding vs unhiding
@@ -191,17 +189,15 @@ app.patch(Object.keys(foldersMap), ensureAuthenticated, function(req, res) {
   var resultHandler = function(err) {
     if (err) {
       if (err.message.includes("ENOENT")) {
-        console.log("rename failed", err);
-        console.log(req.url);
+        console.error("rename failed", err);
         // assume failure is due to resource not found?
         return res.status(404).send(req.file);
       }
-      console.log("rename failed", err);
+      console.error("rename failed", err);
       // assume failure is due to resource not found?
 
       return res.status(400).send(req.file);
     } else {
-      console.log("file renamed");
       updateIndex(path.dirname(req.url));
       return res.status(200).send(req.file);
     }
@@ -225,8 +221,8 @@ app.patch(Object.keys(foldersMap), ensureAuthenticated, function(req, res) {
   );
 });
 
+// add new content to the server
 app.post(Object.keys(foldersMap), function(req, res) {
-  console.log("inside post", req.url, foldersMap[req.url + "*"].name);
   foldersMap[req.url + "*"](req, res, function(err) {
     if (err instanceof multer.MulterError) {
       return res.status(500).json(err);
@@ -240,28 +236,21 @@ app.post(Object.keys(foldersMap), function(req, res) {
   });
 });
 
-//intercept requests for the index, and refresh it first.
+//intercept requests for an index
 app.get("*index.json", function(req, res) {
   //remove the index.json at the end!
-  console.log("url is", req.url);
-  var newUrl = path.dirname(req.url);
-  console.log("url + dirname = ", req.url, path.dirname(req.url));
   res.sendFile(path.normalize(__dirname + req.url), function(err) {
     if (err) {
-      console.log(err);
-    } else {
-      console.log("Sent index:", path.normalize(__dirname + req.url));
+      console.error(err);
     }
   });
-  //removed this for now to debug
-
-  // updateIndex(newUrl).then(function(result) {
-
-  // });
 });
 
-// static content checked for last!
-//shows server contents for debugging etc
+// routes for serving static content come last (only if didn't match another route)
+
+// shows actual server contents for debugging etc (eg if you suspect the index.json
+// isn't in sync with the folder structure...)
+// this is accessible without authentication, but cannot be used to delete/modify files
 app.use(
   "/content",
   express.static("content"),
@@ -270,12 +259,14 @@ app.use(
 
 // for the create-react-app
 app.use("/", ensureAuthenticated, express.static(clientBuildFolder));
+
 // for the create-react-app
 app.get("*", ensureAuthenticated, (req, res) => {
-  console.log("inside catchall " + req.url);
   res.sendFile(path.join(clientBuildFolder, "/index.html"));
 });
 
+// function for updating the index of a content folder after some API operatin has
+// occurred (eg a file deleted/uploaded etc)
 function updateIndex(directory) {
   var indexArray = [];
   const folder = path.parse("." + directory);
@@ -311,15 +302,12 @@ function updateIndex(directory) {
         }
       });
       var json = JSON.stringify(indexArray);
-
-      // add proper callback here
       const indexPath = path.join(path.format(folder), "index.json");
       fs.writeFile(indexPath, json, function(err) {
         if (err) {
-          console.log(err);
+          console.error(err);
           reject(Error("error in fs.writefile"));
         }
-        console.log("The index was updated!");
         resolve("index was updated successfully");
       });
     });
@@ -330,4 +318,4 @@ function updateIndex(directory) {
 const port = process.env.PORT || 8000;
 app.listen(port);
 
-console.log(`FES Express Server listening on ${port}`);
+console.log(`FES CMS Express Server listening on ${port}`);

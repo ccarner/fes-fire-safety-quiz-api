@@ -1,11 +1,7 @@
 import React from "react";
-import UploadFileComponent from "./UploadFileComponent.js";
-import { makeStyles } from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
 import { Link } from "react-router-dom";
-import "./global.css";
-import QuizEditor from "./quizEditor.jsx";
 
+/* homepage of the application */
 class Home extends React.Component {
   render() {
     return (
